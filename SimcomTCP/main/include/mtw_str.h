@@ -3,6 +3,7 @@
 
 #include <string>
 #include <cstring>
+#include <iostream>
 
 #define BYTE_TO_BINARY_PATTERN "%c%c%c%c%c%c%c%c"
 #define BYTE_TO_BINARY(byte)         \

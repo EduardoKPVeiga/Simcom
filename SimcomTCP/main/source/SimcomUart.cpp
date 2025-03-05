@@ -50,6 +50,7 @@ void SimcomUart::send(const char *data)
 
 void SimcomUart::simcom_uart_task(void *pvParameters)
 {
+    cout << "simcom_uart_task" << endl;
     uart_event_t event;
     bool big_receive = false;
     char raw_msg_received[MSG_RECEIVED_BUFF_SIZE] = {0};

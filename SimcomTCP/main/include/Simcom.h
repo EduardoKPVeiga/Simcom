@@ -20,6 +20,9 @@ public:
 
     bool init();
     bool power(bool pwr);
+    bool connect();
+    bool disconnect();
+    bool connected();
 };
 
 #endif // SIMCOM_H

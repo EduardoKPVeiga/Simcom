@@ -25,8 +25,15 @@ void main_task_init(void)
 
 void main_task(void *pvParameters)
 {
+    cout << "Main task started" << endl;
     main_task_queue_message_t msg;
+    unsigned char sn[SN_SIZE] = {'S', '1', 'm', 'C', '0', 'M', '5'};
     pins_init();
+    cout << "Pins initialized" << endl;
+    Simcom simcom = Simcom(sn);
+    cout << "Simcom object created" << endl;
+    simcom.power(true);
+    cout << "Simcom powered on" << endl;
     for (;;)
     {
         if (xQueueReceive(main_task_queue_handle, &msg, portMAX_DELAY))

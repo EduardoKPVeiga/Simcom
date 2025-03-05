@@ -26,7 +26,8 @@
         "xstring": "cpp",
         "xtree": "cpp",
         "string_view": "cpp",
-        "lte.h": "c"
+        "lte.h": "c",
+        "ostream": "cpp"
     },
     "idf.flashType": "UART"
 }

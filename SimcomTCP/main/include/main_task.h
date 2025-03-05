@@ -5,6 +5,8 @@
 #include "freertos/task.h"
 #include "freertos/queue.h"
 #include "pins.h"
+#include "Simcom.h"
+#include "mtw_str.h"
 
 // Main application task
 #define MAIN_TASK_STACK_SIZE 10 * 1024
