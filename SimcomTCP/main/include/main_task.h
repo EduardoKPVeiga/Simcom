@@ -4,6 +4,7 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "freertos/queue.h"
+#include "pins.h"
 
 // Main application task
 #define MAIN_TASK_STACK_SIZE 10 * 1024

@@ -1,5 +1,4 @@
 #include "main_task.h"
-#include "SimcomUart.h"
 
 // Queue handle used to manipulate the main queue of events
 static QueueHandle_t main_task_queue_handle;
@@ -27,12 +26,29 @@ void main_task_init(void)
 void main_task(void *pvParameters)
 {
     main_task_queue_message_t msg;
-    SimcomUart simcomUart;
-    simcomUart.open();
+    pins_init();
     for (;;)
     {
         if (xQueueReceive(main_task_queue_handle, &msg, portMAX_DELAY))
         {
+            switch (msg.msgID)
+            {
+
+            case START_MQTT:
+                break;
+
+            case RESTART_DEVICE:
+                break;
+
+            case UART_DATA_RECEIVED:
+                break;
+
+            case SS_ISR:
+                break;
+
+            default:
+                break;
+            }
         }
     }
 }

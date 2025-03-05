@@ -9,7 +9,7 @@
 
 #include "simcom_definitions.h"
 #include "mtw_str.h"
-#include "Gsm_Resp.h"
+#include "Simcom_Resp.h"
 
 using namespace std;
 

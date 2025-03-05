@@ -4,16 +4,6 @@
 #define SIZE(x) ((sizeof(x)) - 1)
 
 // Gsm application ================================
-// #define PSM // incomplete
-#define GSM_GPS
-// #define GSM
-#define GSM_MQTT
-
-#if defined(GSM_MQTT) || defined(GSM_GPS)
-#ifndef GSM
-#define GSM
-#endif
-#endif
 
 // Gsm flags and delay
 #define ERROR_FLAG_MAX 4
@@ -30,13 +20,21 @@
 
 #define DEFAULT_RESET_TIME 12000 / portTICK_PERIOD_MS // ms
 
-#define GSM_PWR_ON_TIMEOUT 30000 // ms
-#define GSM_PWR_ON_DELAY 10      // ms
-#define GSM_PWR_ON_ATTEMPTS (GSM_PWR_ON_TIMEOUT / GSM_PWR_ON_DELAY)
+#define SIMCOM_PWR_ON_TIMEOUT 30000 // ms
+#define SIMCOM_PWR_ON_DELAY 10      // ms
+#define SIMCOM_PWR_ON_ATTEMPTS (SIMCOM_PWR_ON_TIMEOUT / SIMCOM_PWR_ON_DELAY)
+#define PWRKEY_T_ON 600 / portTICK_PERIOD_MS          // ms
+#define PWRKEY_T_ON_UART 2600 / portTICK_PERIOD_MS    // ms
+#define PWRKEY_T_ON_STATUS 2600 / portTICK_PERIOD_MS  // ms
+#define PWRKEY_T_OFF 1300 / portTICK_PERIOD_MS        // ms
+#define PWRKEY_T_OFF_ON 2100 / portTICK_PERIOD_MS     // ms
+#define PWRKEY_T_OFF_VDD 1900 / portTICK_PERIOD_MS    // ms
+#define PWRKEY_T_OFF_STATUS 5500 / portTICK_PERIOD_MS // ms
+#define PWRKEY_T_RESET 12000 / portTICK_PERIOD_MS     // ms
 
 #define GSM_PWR_OFF_TIMEOUT 5000 // ms
 #define GSM_PWR_OFF_DELAY 10     // ms
-#define GSM_PWR_OFF_ATTEMPTS (GSM_PWR_ON_TIMEOUT / GSM_PWR_ON_DELAY)
+#define GSM_PWR_OFF_ATTEMPTS (SIMCOM_PWR_ON_TIMEOUT / SIMCOM_PWR_ON_DELAY)
 
 #define COORD_ERROR_VALUE INVALID_VALUE
 #define GNSS_LOCATION_VARIABLES 3

@@ -175,13 +175,13 @@ void SimcomUart::msg_received(string msg, size_t size, bool *big_receive, string
         msg_aux = ">";
         string from = "AT+SMPUB=";
         uint16_t size_smpub = msg_aux.size() + from.size();
-        gsm_resp::enqueue(msg_aux, from, size_smpub);
+        simcom_resp::enqueue(msg_aux, from, size_smpub);
         return;
     }
 
     if (received)
     {
-        gsm_resp::enqueue(msg_aux, size_aux);
+        simcom_resp::enqueue(msg_aux, size_aux);
         received = false;
     }
 }

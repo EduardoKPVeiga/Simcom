@@ -14,15 +14,15 @@
 
 using namespace std;
 
-namespace gsm_resp
+namespace simcom_resp
 {
     /**
-     * Initialize gsm_resp_semaphore
+     * Initialize simcom_resp_semaphore
      * @return void
      */
-    void init_gsm_resp_semaphore();
+    void init_simcom_resp_semaphore();
 
-    class Gsm_Resp
+    class Simcom_Resp
     {
     public:
         string from;
@@ -34,7 +34,7 @@ namespace gsm_resp
          * Constructor
          * @author EKPV
          */
-        Gsm_Resp();
+        Simcom_Resp();
 
         /**
          * Constructor
@@ -43,13 +43,13 @@ namespace gsm_resp
          * @param _from : string
          * @param _size : uint16_t
          */
-        Gsm_Resp(string _msg, string _from, uint16_t _size);
+        Simcom_Resp(string _msg, string _from, uint16_t _size);
 
         /**
          * Destructor
          * @author EKPV
          */
-        ~Gsm_Resp();
+        ~Simcom_Resp();
     };
 
     /**
@@ -87,14 +87,14 @@ namespace gsm_resp
      * Remove the first item from queue
      * @return Gsm_Resp
      */
-    Gsm_Resp dequeue();
+    Simcom_Resp dequeue();
 
     /**
      * Get an message from a specific command
      * @param cmd : string
      * @return Gsm_Resp
      */
-    Gsm_Resp get_item(string cmd);
+    Simcom_Resp get_item(string cmd);
 
     /**
      * Get an message from a specific command
@@ -102,7 +102,7 @@ namespace gsm_resp
      * @param msg : string
      * @return Gsm_Resp
      */
-    Gsm_Resp get_item(string cmd, string msg);
+    Simcom_Resp get_item(string cmd, string msg);
 
     /**
      * Extract from attribute

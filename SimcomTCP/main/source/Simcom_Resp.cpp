@@ -1,83 +1,83 @@
-#include "Gsm_Resp.h"
+#include "Simcom_Resp.h"
 
-static const char *TAG = "Gsm_Resp";
+static const char *TAG = "Simcom_Resp";
 
-SemaphoreHandle_t gsm_resp_semaphore = NULL;
-queue<gsm_resp::Gsm_Resp> resp_queue;
+SemaphoreHandle_t simcom_resp_semaphore = NULL;
+queue<simcom_resp::Simcom_Resp> resp_queue;
 
-using namespace gsm_resp;
+using namespace simcom_resp;
 
-void gsm_resp::init_gsm_resp_semaphore()
+void simcom_resp::init_simcom_resp_semaphore()
 {
-    gsm_resp_semaphore = xSemaphoreCreateBinary();
-    xSemaphoreGive(gsm_resp_semaphore);
+    simcom_resp_semaphore = xSemaphoreCreateBinary();
+    xSemaphoreGive(simcom_resp_semaphore);
 }
 
-Gsm_Resp::Gsm_Resp() : from(""),
-                       msg(""),
-                       size(0),
-                       not_used(0) {}
+Simcom_Resp::Simcom_Resp() : from(""),
+                             msg(""),
+                             size(0),
+                             not_used(0) {}
 
-Gsm_Resp::Gsm_Resp(string _msg, string _from, uint16_t _size) : from(_from),
-                                                                msg(_msg),
-                                                                size(_size),
-                                                                not_used(0) {}
+Simcom_Resp::Simcom_Resp(string _msg, string _from, uint16_t _size) : from(_from),
+                                                                      msg(_msg),
+                                                                      size(_size),
+                                                                      not_used(0) {}
 
-Gsm_Resp::~Gsm_Resp() {}
+Simcom_Resp::~Simcom_Resp() {}
 
-bool gsm_resp::queue_empty()
+bool simcom_resp::queue_empty()
 {
     bool value = true;
-    if (xSemaphoreTake(gsm_resp_semaphore, portMAX_DELAY) == pdTRUE)
+    if (xSemaphoreTake(simcom_resp_semaphore, portMAX_DELAY) == pdTRUE)
     {
         value = resp_queue.empty();
-        xSemaphoreGive(gsm_resp_semaphore);
+        xSemaphoreGive(simcom_resp_semaphore);
     }
     return value;
 }
 
-uint16_t gsm_resp::queue_size()
+uint16_t simcom_resp::queue_size()
 {
     if (queue_empty())
         return 0;
 
     uint16_t value = 0;
-    if (xSemaphoreTake(gsm_resp_semaphore, portMAX_DELAY) == pdTRUE)
+    if (xSemaphoreTake(simcom_resp_semaphore, portMAX_DELAY) == pdTRUE)
     {
         value = resp_queue.size();
-        xSemaphoreGive(gsm_resp_semaphore);
+        xSemaphoreGive(simcom_resp_semaphore);
     }
     return value;
 }
 
-void gsm_resp::clear_queue()
+void simcom_resp::clear_queue()
 {
-    if (gsm_resp_semaphore == NULL)
+    if (simcom_resp_semaphore == NULL)
         return;
 
-    if (xSemaphoreTake(gsm_resp_semaphore, portMAX_DELAY) == pdTRUE)
+    if (xSemaphoreTake(simcom_resp_semaphore, portMAX_DELAY) == pdTRUE)
     {
         while (!resp_queue.empty())
             resp_queue.pop();
-        xSemaphoreGive(gsm_resp_semaphore);
+        xSemaphoreGive(simcom_resp_semaphore);
     }
 }
 
-void gsm_resp::enqueue(string _msg, string _from, uint16_t _size)
+void simcom_resp::enqueue(string _msg, string _from, uint16_t _size)
 {
-    if (xSemaphoreTake(gsm_resp_semaphore, portMAX_DELAY) == pdTRUE)
+    if (xSemaphoreTake(simcom_resp_semaphore, portMAX_DELAY) == pdTRUE)
     {
-        Gsm_Resp item = Gsm_Resp(_msg, _from, _size);
+        Simcom_Resp item = Simcom_Resp(_msg, _from, _size);
 
         if (resp_queue.size() >= MAX_RESP_NUM)
             resp_queue.pop();
         resp_queue.push(item);
 
-        xSemaphoreGive(gsm_resp_semaphore);
+        xSemaphoreGive(simcom_resp_semaphore);
     }
 }
 
-void gsm_resp::enqueue(string msg, uint16_t size)
+void simcom_resp::enqueue(string msg, uint16_t size)
 {
     int begin = msg.find(BEGIN_CMD);
     if (begin >= 0)
@@ -92,24 +92,24 @@ void gsm_resp::enqueue(string msg, uint16_t size)
     }
 }
 
-Gsm_Resp gsm_resp::dequeue()
+Simcom_Resp simcom_resp::dequeue()
 {
-    Gsm_Resp item = Gsm_Resp();
-    if (xSemaphoreTake(gsm_resp_semaphore, portMAX_DELAY) == pdTRUE)
+    Simcom_Resp item = Simcom_Resp();
+    if (xSemaphoreTake(simcom_resp_semaphore, portMAX_DELAY) == pdTRUE)
     {
         item = resp_queue.front();
         resp_queue.pop();
-        xSemaphoreGive(gsm_resp_semaphore);
+        xSemaphoreGive(simcom_resp_semaphore);
     }
     return item;
 }
 
-Gsm_Resp gsm_resp::get_item(string cmd)
+Simcom_Resp simcom_resp::get_item(string cmd)
 {
-    queue<Gsm_Resp> aux_queue;
-    Gsm_Resp item = Gsm_Resp();
+    queue<Simcom_Resp> aux_queue;
+    Simcom_Resp item = Simcom_Resp();
 
-    if (xSemaphoreTake(gsm_resp_semaphore, portMAX_DELAY) == pdTRUE)
+    if (xSemaphoreTake(simcom_resp_semaphore, portMAX_DELAY) == pdTRUE)
     {
         while (!resp_queue.empty())
         {
@@ -129,17 +129,17 @@ Gsm_Resp gsm_resp::get_item(string cmd)
             resp_queue.push(aux_queue.front());
             aux_queue.pop();
         }
-        xSemaphoreGive(gsm_resp_semaphore);
+        xSemaphoreGive(simcom_resp_semaphore);
     }
     return item;
 }
 
-Gsm_Resp gsm_resp::get_item(string cmd, string msg)
+Simcom_Resp simcom_resp::get_item(string cmd, string msg)
 {
-    queue<Gsm_Resp> aux_queue;
-    Gsm_Resp item = Gsm_Resp();
+    queue<Simcom_Resp> aux_queue;
+    Simcom_Resp item = Simcom_Resp();
 
-    if (xSemaphoreTake(gsm_resp_semaphore, portMAX_DELAY) == pdTRUE)
+    if (xSemaphoreTake(simcom_resp_semaphore, portMAX_DELAY) == pdTRUE)
     {
         while (!resp_queue.empty())
         {
@@ -159,12 +159,12 @@ Gsm_Resp gsm_resp::get_item(string cmd, string msg)
             resp_queue.push(aux_queue.front());
             aux_queue.pop();
         }
-        xSemaphoreGive(gsm_resp_semaphore);
+        xSemaphoreGive(simcom_resp_semaphore);
     }
     return item;
 }
 
-string gsm_resp::extract_from(string msg, uint16_t size)
+string simcom_resp::extract_from(string msg, uint16_t size)
 {
     string from = "";
     int index = 0;
@@ -190,7 +190,7 @@ string gsm_resp::extract_from(string msg, uint16_t size)
     return from;
 }
 
-string gsm_resp::extract_msg(string msg, uint16_t size)
+string simcom_resp::extract_msg(string msg, uint16_t size)
 {
     string msg_str = "";
     int i = 0;
@@ -216,7 +216,7 @@ string gsm_resp::extract_msg(string msg, uint16_t size)
     return msg_str;
 }
 
-string gsm_resp::c_array_to_string(char *c_array, uint16_t size)
+string simcom_resp::c_array_to_string(char *c_array, uint16_t size)
 {
     string msg = "";
     for (int i = 0; i < size; i++)
