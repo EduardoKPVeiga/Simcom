@@ -1,0 +1,31 @@
+{
+    "C_Cpp.intelliSenseEngine": "default",
+    "idf.espIdfPathWin": "C:\\Users\\epont\\esp\\esp-idf",
+    "idf.pythonInstallPath": "C:\\Users\\epont\\.espressif\\tools\\idf-python\\3.11.2\\python.exe",
+    "idf.openOcdConfigs": [
+        "board/esp32-bridge.cfg"
+    ],
+    "idf.portWin": "COM5",
+    "idf.toolsPathWin": "C:\\Users\\epont\\.espressif",
+    "files.associations": {
+        "main_task.h": "c",
+        "interface.h": "c",
+        "simcomuart.h": "c",
+        "pins.h": "c",
+        "gsm_resp.h": "c",
+        "mtw_str.h": "c",
+        "gsm_definitions.h": "c",
+        "common.h": "c",
+        "simcom.h": "c",
+        "eth_lte.h": "c",
+        "iostream": "c",
+        "definitions.h": "c",
+        "freertos.h": "c",
+        "uart.h": "c",
+        "xhash": "cpp",
+        "xstring": "cpp",
+        "xtree": "cpp",
+        "string_view": "cpp"
+    },
+    "idf.flashType": "UART"
+}
