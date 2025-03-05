@@ -146,13 +146,13 @@ void SimcomUart::msg_received(string msg, size_t size, bool *big_receive, string
 {
     string msg_aux = msg;
     size_t size_aux = size;
-    if (msg.contains(APP_PDP) || msg.contains(RESP_SMS_READY) || msg.contains(CGNSPWR) || msg.contains(SGNSCMD) || msg.contains(SGNSERR) || msg.contains(SMCONN_RESP_TRUE) || msg.contains(SMS_READY))
+    if (msg.find(APP_PDP) != std::string::npos || msg.find(RESP_SMS_READY) != std::string::npos || msg.find(CGNSPWR) != std::string::npos || msg.find(SGNSCMD) != std::string::npos || msg.find(SGNSERR) != std::string::npos || msg.find(SMCONN_RESP_TRUE) != std::string::npos || msg.find(SMS_READY) != std::string::npos)
     {
         received = true;
     }
-    else if (!msg.contains('>'))
+    else if (!msg.find('>'))
     {
-        if (!msg.contains(RESP_OK) && !msg.contains(RESP_ERROR))
+        if (!msg.find(RESP_OK) && !msg.find(RESP_ERROR))
         {
             (*big_receive) = true;
             received = false;

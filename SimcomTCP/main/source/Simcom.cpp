@@ -1,11 +1,11 @@
 #include "Simcom.h"
 
-Simcom::Simcom() : simcomUart(SimcomUart()), lte(Lte())
+Simcom::Simcom() : simcomUart(SimcomUart()), cmd_queue(SimcomCmdQueue(cmd_queue_type_e::EMPTY))
 {
     simcomUart.open();
 }
 
-Simcom::Simcom(unsigned char sn[SN_SIZE]) : simcomUart(SimcomUart()), lte(Lte())
+Simcom::Simcom(unsigned char sn[SN_SIZE]) : simcomUart(SimcomUart()), cmd_queue(SimcomCmdQueue(cmd_queue_type_e::EMPTY))
 {
     memcpy(serial_num, sn, SN_SIZE);
     simcomUart.open();
@@ -22,19 +22,4 @@ bool Simcom::power(bool pwr)
     v = pwr ? pwrkey_power_on() : pwrkey_power_off();
     simcomUart.open();
     return v;
-}
-
-bool Simcom::connect()
-{
-    return lte.connect();
-}
-
-bool Simcom::disconnect()
-{
-    return lte.disconnect();
-}
-
-bool Simcom::connected()
-{
-    return lte.connected();
 }
