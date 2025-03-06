@@ -32,6 +32,8 @@ void main_task(void *pvParameters)
     Simcom simcom = Simcom(sn);
     simcom.power(true);
 
+    main_task_send_message(START_MQTT);
+
     for (;;)
     {
         if (xQueueReceive(main_task_queue_handle, &msg, portMAX_DELAY))

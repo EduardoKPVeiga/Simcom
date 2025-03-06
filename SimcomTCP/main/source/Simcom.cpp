@@ -29,7 +29,7 @@ void Simcom::set_queue(SimcomCmdQueue queue)
     cmd_queue = queue;
 }
 
-void Simcom::send()
+bool Simcom::send()
 {
     Command cmd;
     uint16_t size = 0;
@@ -39,6 +39,13 @@ void Simcom::send()
     {
         cmd = cmd_queue.dequeue();
         cmd.build(msg_send, &size);
-        simcomUart.send(msg_send);
+        simcomUart.send(msg_send, (size_t)size);
+        vTaskDelay(100 / portTICK_PERIOD_MS);
+
+        SimcomResp resp = simcomUart.get_resp(cmd);
+        // Validar resposta
+        if (!resp.valid(cmd))
+            return false;
     }
+    return true;
 }

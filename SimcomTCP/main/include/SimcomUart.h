@@ -9,7 +9,8 @@
 
 #include "simcom_definitions.h"
 #include "mtw_str.h"
-#include "Simcom_Resp.h"
+#include "SimcomRespList.h"
+#include "Command.h"
 
 using namespace std;
 
@@ -34,11 +35,15 @@ private:
 public:
     static volatile bool received;
     static uart_port_t uart_num;
+    static SimcomRespList simcom_resp_list;
+
     SimcomUart();
     ~SimcomUart();
+
     static void open();
     static void close();
-    static void send(const char *data);
+    static void send(const char *data, size_t size);
+    static SimcomResp get_resp(Command cmd);
 };
 
 #endif // SIMCOMUART_H

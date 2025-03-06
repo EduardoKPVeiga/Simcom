@@ -3,7 +3,6 @@
 
 #include "common.h"
 #include "simcom_definitions.h"
-#include "Simcom_Resp.h"
 #include "SimcomUart.h"
 #include <list>
 

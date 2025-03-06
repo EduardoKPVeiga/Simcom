@@ -6,6 +6,7 @@ QueueHandle_t SimcomUart::uart_queue = NULL;
 TaskHandle_t SimcomUart::uartGsmTaskHandle = NULL;
 volatile bool SimcomUart::received = false;
 uart_port_t SimcomUart::uart_num = UART_NUM_2;
+SimcomRespList SimcomUart::simcom_resp_list = SimcomRespList();
 
 SimcomUart::SimcomUart()
 {
@@ -44,8 +45,10 @@ void SimcomUart::close()
     set_pin(PIN_SINCOM_TX, GPIO_MODE_INPUT, GPIO_INTR_DISABLE, NULL, NULL);
 }
 
-void SimcomUart::send(const char *data)
+void SimcomUart::send(const char *data, size_t size)
 {
+    uart_write_bytes(uart_num, data, size);
+    uart_wait_tx_done(uart_num, 100);
 }
 
 void SimcomUart::simcom_uart_task(void *pvParameters)
@@ -65,17 +68,26 @@ void SimcomUart::simcom_uart_task(void *pvParameters)
             switch (event.type)
             {
             case UART_DATA:
+                cout << "UART_DATA" << endl;
                 size = event.size;
                 uart_read_bytes(uart_num, raw_msg_received, size, portMAX_DELAY);
+                cout << "A" << endl;
 
                 if (mtw_str::StrContainsSubstr(raw_msg_received, SMSUB, size, SIZE(SMSUB)) >= 0 && mtw_str::StrContainsSubstr(raw_msg_received, BEGIN_CMD, size, SIZE(BEGIN_CMD)) < 0)
+                {
+                    cout << "B1" << endl;
                     smsub_received(raw_msg_received, size);
+                    cout << "C1" << endl;
+                }
                 else
                 {
+                    cout << "B2" << endl;
                     mtw_str::remove_char(raw_msg_received, &size, '\0');
                     mtw_str::remove_char(raw_msg_received, &size, '\r');
                     msg = string(raw_msg_received, size);
+                    cout << "C2" << endl;
                     msg_received(msg, size, &big_receive, &last_msg);
+                    cout << "C3" << endl;
                 }
                 break;
 
@@ -173,13 +185,13 @@ void SimcomUart::msg_received(string msg, size_t size, bool *big_receive, string
         msg_aux = ">";
         string from = "AT+SMPUB=";
         uint16_t size_smpub = msg_aux.size() + from.size();
-        simcom_resp::enqueue(msg_aux, from, size_smpub);
+        simcom_resp_list.add(SimcomResp(msg_aux, from, size_smpub));
         return;
     }
 
     if (received)
     {
-        simcom_resp::enqueue(msg_aux, size_aux);
+        simcom_resp_list.add(SimcomResp(msg_aux, size_aux));
         received = false;
     }
 }
