@@ -3,6 +3,7 @@
 
 #include <queue>
 #include "Command.h"
+#include "Casend.h"
 
 enum cmd_queue_type_e
 {
@@ -15,6 +16,7 @@ class SimcomCmdQueue
 private:
     cmd_queue_type_e type;
     queue<Command> cmd_queue;
+    queue<Casend> casend_queue;
 
 public:
     SimcomCmdQueue(cmd_queue_type_e t);
@@ -22,6 +24,8 @@ public:
 
     void enqueue(Command cmd);
     Command dequeue();
+    void enqueue_casend(Casend cmd);
+    Casend dequeue_casend();
     bool is_empty();
 };
 

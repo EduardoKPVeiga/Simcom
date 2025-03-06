@@ -3,8 +3,8 @@
 
 #include "common.h"
 #include "simcom_definitions.h"
-#include "SimcomUart.h"
 #include <list>
+#include "mtw_str.h"
 
 using namespace std;
 
@@ -70,14 +70,13 @@ public:
 
 class Command
 {
-private:
+public:
     const char *cmd;
     CMD_action_enum action;
     list<Value> values;
     char msg_send[MAX_NUM_CHAR_SEND_BUFF];
     uint16_t size;
 
-public:
     /**
      * Constructor
      * @author EKPV

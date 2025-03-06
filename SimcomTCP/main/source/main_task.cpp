@@ -25,7 +25,6 @@ void main_task_init(void)
 
 void main_task(void *pvParameters)
 {
-    cout << "Main task started" << endl;
     main_task_queue_message_t msg;
     unsigned char sn[SN_SIZE] = {'S', '1', 'm', 'C', '0', 'M', '5'};
     pins_init();
@@ -100,6 +99,20 @@ SimcomCmdQueue create_start_mqtt_queue()
     queue.enqueue(cmd);
 
     cmd = Command(CNACT, CMD_action_enum::READ);
+    queue.enqueue(cmd);
+
+    cmd = Command(CASSLCFG, CMD_action_enum::WRITE);
+    cmd.add_value(Value((int)0));
+    cmd.add_value(Value("SSL"));
+    cmd.add_value(Value((int)0));
+    queue.enqueue(cmd);
+
+    cmd = Command(CAOPEN, CMD_action_enum::WRITE);
+    cmd.add_value(Value((int)0));
+    cmd.add_value(Value((int)0));
+    cmd.add_value(Value("TCP"));
+    cmd.add_value(Value("172.104.199.107"));
+    cmd.add_value(Value((int)1883));
     queue.enqueue(cmd);
 
     return queue;

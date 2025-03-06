@@ -32,20 +32,33 @@ void Simcom::set_queue(SimcomCmdQueue queue)
 bool Simcom::send()
 {
     Command cmd;
+    Casend casend_cmd;
     uint16_t size = 0;
     char msg_send[MAX_NUM_CHAR_SEND_BUFF] = {0};
 
     while (!cmd_queue.is_empty())
     {
         cmd = cmd_queue.dequeue();
-        cmd.build(msg_send, &size);
-        simcomUart.send(msg_send, (size_t)size);
-        vTaskDelay(100 / portTICK_PERIOD_MS);
+        if (mtw_str::StrContainsSubstr((char *)(cmd.cmd), CASEND, SIZE(CASEND), SIZE(CASEND) >= 0))
+        {
+            casend_cmd = cmd_queue.dequeue_casend();
+            casend_cmd.build(msg_send, &size);
+            simcomUart.send(msg_send, (size_t)size);
+            vTaskDelay(1000 / portTICK_PERIOD_MS);
+            simcomUart.send(casend_cmd.data, casend_cmd.data_size);
+            vTaskDelay(1000 / portTICK_PERIOD_MS);
+        }
+        else
+        {
+            cmd.build(msg_send, &size);
+            simcomUart.send(msg_send, (size_t)size);
+            vTaskDelay(1000 / portTICK_PERIOD_MS);
 
-        SimcomResp resp = simcomUart.get_resp(cmd);
-        // Validar resposta
-        if (!resp.valid(cmd))
-            return false;
+            SimcomResp resp = simcomUart.get_resp(cmd);
+            // Validar resposta
+            if (!resp.valid(cmd))
+                return false;
+        }
     }
     return true;
 }

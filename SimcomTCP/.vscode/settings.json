@@ -90,7 +90,9 @@
         "streambuf": "cpp",
         "thread": "cpp",
         "cinttypes": "cpp",
-        "typeinfo": "cpp"
+        "typeinfo": "cpp",
+        "simcomresplist.h": "c",
+        "simcomcmdqueue.h": "c"
     },
     "idf.flashType": "UART"
 }

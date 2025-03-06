@@ -22,6 +22,18 @@ Command SimcomCmdQueue::dequeue()
     return cmd;
 }
 
+void SimcomCmdQueue::enqueue_casend(Casend cmd)
+{
+    casend_queue.push(cmd);
+}
+
+Casend SimcomCmdQueue::dequeue_casend()
+{
+    Casend cmd = casend_queue.front();
+    casend_queue.pop();
+    return cmd;
+}
+
 bool SimcomCmdQueue::is_empty()
 {
     return cmd_queue.empty();

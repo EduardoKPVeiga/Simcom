@@ -4,6 +4,7 @@
 // #include "Lte.h"
 #include "SimcomUart.h"
 #include "SimcomCmdQueue.h"
+#include "simcom_definitions.h"
 
 #define SN_SIZE 7
 
