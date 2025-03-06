@@ -71,17 +71,16 @@ The SIM7070 series adopts LCC form factor and has a compact size of 24mm*24mm wh
 
 The SIM7070 series has powerful expansibility with abundant interfaces including UART, GPIO, PCM, SPI, I2C etc. The SIM7070 series is designed for applications that need low latency, low throughput data communication in a variety of radio propagation conditions. Due to the unique combination of performance, security and flexibility, this module is ideally suited for M2M applications, such as metering,asset tracking, remote monitoring, E-health etc.
 
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
-
 
 <!-- USAGE EXAMPLES -->
 ## Usage
 
+
+[![Product Name Screen Shot][class-diagram]](https://github.com/EduardoKPVeiga/TmDev_TCP_connection_test/blob/main/simcom.drawio)
+
 Used with XBoard version v3.0 and TmDev ETH GSM v1.1.
 
 _For more examples, please refer to the [Documentation](https://www.mtwbrasil.com.br/detalhes-produto.php?id=61)_
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 
 
@@ -98,3 +97,4 @@ Project Link: [https://github.com/EduardoKPVeiga/TmDev_TCP_connection_test](http
 <!-- MARKDOWN LINKS & IMAGES -->
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
 [product-screenshot]: images/screenshot.png
+[class-diagram]: images/diagram.png
