@@ -23,3 +23,22 @@ bool Simcom::power(bool pwr)
     simcomUart.open();
     return v;
 }
+
+void Simcom::set_queue(SimcomCmdQueue queue)
+{
+    cmd_queue = queue;
+}
+
+void Simcom::send()
+{
+    Command cmd;
+    uint16_t size = 0;
+    char msg_send[MAX_NUM_CHAR_SEND_BUFF] = {0};
+
+    while (!cmd_queue.is_empty())
+    {
+        cmd = cmd_queue.dequeue();
+        cmd.build(msg_send, &size);
+        simcomUart.send(msg_send);
+    }
+}

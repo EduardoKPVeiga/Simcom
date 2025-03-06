@@ -11,7 +11,6 @@ class Simcom
 {
 private:
     SimcomUart simcomUart;
-    // Lte lte;
     SimcomCmdQueue cmd_queue;
     char serial_num[SN_SIZE];
 
@@ -21,6 +20,8 @@ public:
     ~Simcom();
 
     bool power(bool pwr);
+    void set_queue(SimcomCmdQueue queue);
+    void send();
 };
 
 #endif // SIMCOM_H

@@ -78,15 +78,6 @@ private:
     char msg_send[MAX_NUM_CHAR_SEND_BUFF];
     uint16_t size;
 
-    /**
-     * Build command to send to GSM module
-     * @author EKPV
-     * @param msg_send : char *
-     * @param size : uint16_t *
-     * @return void
-     */
-    void build(char *msg_send, uint16_t *size);
-
 public:
     /**
      * Constructor
@@ -115,6 +106,15 @@ public:
      * @return void
      */
     void add_value(Value value);
+
+    /**
+     * Build command to send to GSM module
+     * @author EKPV
+     * @param msg_send : char *
+     * @param size : uint16_t *
+     * @return void
+     */
+    void build(char *msg_send, uint16_t *size);
 };
 
 #endif /* COMMAND_H_ */

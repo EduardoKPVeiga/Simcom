@@ -29,11 +29,9 @@ void main_task(void *pvParameters)
     main_task_queue_message_t msg;
     unsigned char sn[SN_SIZE] = {'S', '1', 'm', 'C', '0', 'M', '5'};
     pins_init();
-    cout << "Pins initialized" << endl;
     Simcom simcom = Simcom(sn);
-    cout << "Simcom object created" << endl;
     simcom.power(true);
-    cout << "Simcom powered on" << endl;
+
     for (;;)
     {
         if (xQueueReceive(main_task_queue_handle, &msg, portMAX_DELAY))
@@ -42,9 +40,18 @@ void main_task(void *pvParameters)
             {
 
             case START_MQTT:
+                simcom.set_queue(create_start_mqtt_queue());
+                simcom.send();
+                break;
+
+            case SEND_MSG:
+                simcom.set_queue(create_send_msg_queue());
+                simcom.send();
                 break;
 
             case RESTART_DEVICE:
+                simcom.power(false);
+                esp_restart();
                 break;
 
             case UART_DATA_RECEIVED:
@@ -58,4 +65,46 @@ void main_task(void *pvParameters)
             }
         }
     }
+}
+
+SimcomCmdQueue create_start_mqtt_queue()
+{
+    SimcomCmdQueue queue = SimcomCmdQueue(cmd_queue_type_e::PDN_AUTO_ACT);
+
+    Command cmd = Command(CPIN, CMD_action_enum::READ);
+    queue.enqueue(cmd);
+
+    cmd = Command(CSQ, CMD_action_enum::EXE);
+    queue.enqueue(cmd);
+
+    cmd = Command(CGATT, CMD_action_enum::READ);
+    queue.enqueue(cmd);
+
+    cmd = Command(COPS, CMD_action_enum::READ);
+    queue.enqueue(cmd);
+
+    cmd = Command(CGNAPN, CMD_action_enum::EXE);
+    queue.enqueue(cmd);
+
+    cmd = Command(CNCFG, CMD_action_enum::WRITE);
+    cmd.add_value(Value((int)0));
+    cmd.add_value(Value((int)1));
+    cmd.add_value(Value("ctnb"));
+    queue.enqueue(cmd);
+
+    cmd = Command(CNACT, CMD_action_enum::WRITE);
+    cmd.add_value(Value((int)0));
+    cmd.add_value(Value((int)1));
+    queue.enqueue(cmd);
+
+    cmd = Command(CNACT, CMD_action_enum::READ);
+    queue.enqueue(cmd);
+
+    return queue;
+}
+
+SimcomCmdQueue create_send_msg_queue()
+{
+    SimcomCmdQueue queue = SimcomCmdQueue(cmd_queue_type_e::EMPTY);
+    return queue;
 }

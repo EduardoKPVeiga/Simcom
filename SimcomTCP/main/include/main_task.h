@@ -19,6 +19,7 @@
 typedef enum main_task_message
 {
     START_MQTT,
+    SEND_MSG,
     RESTART_DEVICE,
     UART_DATA_RECEIVED,
     SS_ISR
@@ -37,5 +38,9 @@ BaseType_t main_task_send_message_from_isr(main_task_message_e msgID);
 void main_task_init(void);
 
 void main_task(void *pvParameters);
+
+SimcomCmdQueue create_start_mqtt_queue();
+
+SimcomCmdQueue create_send_msg_queue();
 
 #endif // MAIN_TASK_H

@@ -137,9 +137,6 @@ void SimcomUart::smsub_received(char *msg, size_t size)
     if (slot == '0')
         ;
     // decode_message(buff, msg_pub_size);
-    else if ((slot == '2') || (slot == '3') || (slot == '4'))
-        ;
-    // set_uart_gsm_exp_buff(buff, msg_pub_size, slot - '0');
 }
 
 void SimcomUart::msg_received(string msg, size_t size, bool *big_receive, string *last_msg)
