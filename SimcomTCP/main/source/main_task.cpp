@@ -49,6 +49,8 @@ void main_task(void *pvParameters)
             case SEND_MSG:
                 simcom.set_queue(create_send_msg_queue());
                 simcom.send();
+                vTaskDelay(5000 / portTICK_PERIOD_MS);
+                main_task_send_message(SEND_MSG);
                 break;
 
             case RESTART_DEVICE:

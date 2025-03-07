@@ -81,30 +81,26 @@ void mtw_str::remove_char(char *a, size_t *size, char c)
 
 int mtw_str::StrContainsSubstr(char *str, char *sub_str, int size_str, int size_sub_str)
 {
-    bool first_time = false;
-    int begin_position = -1;
     if (size_sub_str > size_str)
         return -1;
+
+    int begin_position = -1;
     int i = 0, j = 0;
     for (; i < size_str; i++)
     {
-        if (str[i] == sub_str[j] && j < size_str)
+        if (str[i] == sub_str[j])
         {
-            if (!first_time)
-            {
-                first_time = true;
-                begin_position = i;
-            }
-            if (j == size_sub_str - 1)
-            {
-                return begin_position;
-            }
+            if (j == 0)
+                begin_position = i; // Marca início da correspondência
+
             j++;
+
+            if (j == size_sub_str)
+                return begin_position;
         }
         else
         {
-            first_time = false;
-            begin_position = -1;
+            i -= j; // Retorna para a posição inicial da busca
             j = 0;
         }
     }
