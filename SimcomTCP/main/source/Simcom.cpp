@@ -41,7 +41,6 @@ bool Simcom::send()
         cmd = cmd_queue.dequeue();
         if (mtw_str::StrContainsSubstr((char *)(cmd.cmd), CASEND, SIZE(CASEND), SIZE(CASEND)) >= 0)
         {
-            cout << "found." << endl;
             casend_cmd = cmd_queue.dequeue_casend();
             casend_cmd.build(msg_send, &size);
             simcomUart.send(msg_send, (size_t)size);

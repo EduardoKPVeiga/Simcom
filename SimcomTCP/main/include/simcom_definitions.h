@@ -383,6 +383,7 @@ enum Network_select_enum
 // TCP/UDP
 #define CACFG "+CACFG"     // configure transparent transmission parameters
 #define CAOPEN "+CAOPEN"   // Open a TCP/UDP connection
+#define CACLOSE "+CACLOSE" // Close a TCP/UDP connection
 #define CASTATE "+CASTATE" // Query TCP/UDP connection state
 
 #define KEEPALIVE "KEEPALIVE"
