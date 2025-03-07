@@ -67,7 +67,7 @@ The SIM7070 series has powerful expansibility with abundant interfaces including
 
 [![Product Name Screen Shot][class-diagram]](https://github.com/EduardoKPVeiga/TmDev_TCP_connection_test/blob/main/simcom.drawio)
 
-Used with XBoard version v3.0 and TmDev ETH GSM v1.1.
+Used with ESP32-WROOM-32E.
 
 
 <!-- CONTACT -->
