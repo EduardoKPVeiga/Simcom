@@ -15,8 +15,8 @@
 #define PIN_SS3 GPIO_NUM_33
 #define PIN_SS4 GPIO_NUM_32
 
-#define PIN_SINCOM_RX GPIO_NUM_19
-#define PIN_SINCOM_TX GPIO_NUM_23
+#define PIN_SIMCOM_RX GPIO_NUM_19
+#define PIN_SIMCOM_TX GPIO_NUM_23
 
 #define PIN_SDA GPIO_NUM_21
 #define PIN_SCL GPIO_NUM_22
@@ -56,7 +56,7 @@ bool simcom_get_pwr_mode(void);
 bool pwrkey_power_on();
 bool pwrkey_power_off();
 bool gpio_pwrkey_write(bool value);
-
+esp_err_t i2c_init(void);
 esp_err_t pca9535_init();
 esp_err_t pca9535_write(uint8_t command, uint8_t data);
 esp_err_t pca9535_read(uint8_t command, uint8_t *data);

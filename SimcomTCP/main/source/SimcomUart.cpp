@@ -35,14 +35,14 @@ void SimcomUart::config()
 
 void SimcomUart::open()
 {
-    uart_set_pin(uart_num, PIN_SINCOM_TX, PIN_SINCOM_RX, UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE);
+    uart_set_pin(uart_num, PIN_SIMCOM_TX, PIN_SIMCOM_RX, UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE);
 }
 
 void SimcomUart::close()
 {
     uart_set_pin(uart_num, GPIO_NUM_NC, GPIO_NUM_NC, UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE);
-    set_pin(PIN_SINCOM_RX, GPIO_MODE_INPUT, GPIO_INTR_DISABLE, NULL, NULL);
-    set_pin(PIN_SINCOM_TX, GPIO_MODE_INPUT, GPIO_INTR_DISABLE, NULL, NULL);
+    set_pin(PIN_SIMCOM_RX, GPIO_MODE_INPUT, GPIO_INTR_DISABLE, NULL, NULL);
+    set_pin(PIN_SIMCOM_TX, GPIO_MODE_INPUT, GPIO_INTR_DISABLE, NULL, NULL);
 }
 
 void SimcomUart::send(const char *data, size_t size)
@@ -53,7 +53,6 @@ void SimcomUart::send(const char *data, size_t size)
 
 void SimcomUart::simcom_uart_task(void *pvParameters)
 {
-    cout << "simcom_uart_task" << endl;
     uart_event_t event;
     bool big_receive = false;
     char raw_msg_received[MSG_RECEIVED_BUFF_SIZE] = {0};

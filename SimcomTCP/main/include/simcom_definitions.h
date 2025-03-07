@@ -319,6 +319,8 @@ enum Thread_action_enum
 #define CPIN "+CPIN"             // SIM card status
 #define CASSLCFG "+CASSLCFG"     // SSL configure
 #define CASEND "+CASEND"         // Request to send data through TCP/UDP
+#define CAACK "+CAACK"           // Query send data information
+#define CARECV "+CARECV"         // Receive Data via an Established Connection
 
 #define CNACT "+CNACT" // APP network active
 #define CMNB "+CMNB"   // Preferred selection between CAT-M and NB-IoT

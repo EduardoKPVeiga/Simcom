@@ -23,23 +23,12 @@
 <!-- PROJECT LOGO -->
 <br />
 <div align="center">
-  <a href="https://github.com/othneildrew/Best-README-Template">
-    <img src="images/logo.png" alt="Logo" width="80" height="80">
-  </a>
 
   <h3 align="center">SIMCOM7070G TCP connection test</h3>
 
   <p align="center">
     A project used to test MQTT protocol using TCP commands
     <br />
-    <a href="https://github.com/othneildrew/Best-README-Template"><strong>Explore the docs »</strong></a>
-    <br />
-    <br />
-    <a href="https://github.com/othneildrew/Best-README-Template">View Demo</a>
-    &middot;
-    <a href="https://github.com/othneildrew/Best-README-Template/issues/new?labels=bug&template=bug-report---.md">Report Bug</a>
-    &middot;
-    <a href="https://github.com/othneildrew/Best-README-Template/issues/new?labels=enhancement&template=feature-request---.md">Request Feature</a>
   </p>
 </div>
 
@@ -79,9 +68,6 @@ The SIM7070 series has powerful expansibility with abundant interfaces including
 [![Product Name Screen Shot][class-diagram]](https://github.com/EduardoKPVeiga/TmDev_TCP_connection_test/blob/main/simcom.drawio)
 
 Used with XBoard version v3.0 and TmDev ETH GSM v1.1.
-
-_For more examples, please refer to the [Documentation](https://www.mtwbrasil.com.br/detalhes-produto.php?id=61)_
-
 
 
 <!-- CONTACT -->

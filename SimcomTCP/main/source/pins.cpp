@@ -1,10 +1,14 @@
 #include "pins.h"
+#include "mtw_str.h"
 
 uint8_t ioexp = 0;
 SemaphoreHandle_t sensors_semaphore;
 
 void pins_init(void)
 {
+    sensors_semaphore = xSemaphoreCreateBinary();
+    xSemaphoreGive(sensors_semaphore);
+
     gpio_install_isr_service(ESP_INTR_FLAG_DEFAULT);
     set_pin(PIN_SPARE0, GPIO_MODE_INPUT, GPIO_INTR_DISABLE, NULL, NULL);
     set_pin(PIN_CMD_BTN, GPIO_MODE_INPUT, GPIO_INTR_ANYEDGE, NULL, NULL);
@@ -15,12 +19,19 @@ void pins_init(void)
     set_pin(PIN_SS3, GPIO_MODE_OUTPUT, GPIO_INTR_DISABLE, NULL, NULL);
     set_pin(PIN_SS4, GPIO_MODE_OUTPUT, GPIO_INTR_DISABLE, NULL, NULL);
     set_pin(PIN_RST_MOD, GPIO_MODE_INPUT, GPIO_INTR_DISABLE, NULL, NULL);
+    set_pin(PIN_SIMCOM_STATUS, GPIO_MODE_INPUT, GPIO_INTR_DISABLE, NULL, NULL);
+    set_pin(PIN_SIMCOM_RX, GPIO_MODE_INPUT, GPIO_INTR_DISABLE, NULL, NULL);
+    set_pin(PIN_SIMCOM_TX, GPIO_MODE_INPUT, GPIO_INTR_DISABLE, NULL, NULL);
+
+    i2c_init();
+    pca9535_init();
+
+    // RST_MOD
+    ioexp |= 0b00010000;
+    pca9535_write(PCA_OUTPU1, ioexp);
 
     vTaskDelay(1 / portTICK_PERIOD_MS);
     gpio_set_level(PIN_LED, true);
-
-    sensors_semaphore = xSemaphoreCreateBinary();
-    xSemaphoreGive(sensors_semaphore);
 }
 
 void set_pin(gpio_num_t pin, gpio_mode_t mode, gpio_int_type_t interrupt, gpio_isr_t isr, void *args)
@@ -93,6 +104,29 @@ bool gpio_pwrkey_write(bool value)
     else
         ioexp &= ~(0b00000001);
     return pca9535_write(PCA_OUTPU1, ioexp) == ESP_OK ? true : false;
+}
+
+esp_err_t i2c_init(void)
+{
+    esp_err_t ret;
+
+    // setup i2c controller
+    i2c_config_t conf;
+    conf.mode = I2C_MODE_MASTER;
+    conf.sda_io_num = PIN_SDA;
+    conf.scl_io_num = PIN_SCL;
+    conf.sda_pullup_en = GPIO_PULLUP_ENABLE;
+    conf.scl_pullup_en = GPIO_PULLUP_ENABLE;
+    conf.master.clk_speed = 100000;
+    conf.clk_flags = 0;
+    ret = i2c_param_config(I2C_NUM_0, &conf);
+    if (ret != ESP_OK)
+        return ret;
+
+    ret = i2c_driver_install(I2C_NUM_0, I2C_MODE_MASTER, 0, 0, 0);
+    vTaskDelay(1000 / portTICK_PERIOD_MS);
+
+    return ret;
 }
 
 esp_err_t pca9535_init()

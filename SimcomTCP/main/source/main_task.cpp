@@ -32,6 +32,7 @@ void main_task(void *pvParameters)
     simcom.power(true);
 
     main_task_send_message(START_MQTT);
+    main_task_send_message(SEND_MSG);
 
     for (;;)
     {
@@ -121,5 +122,22 @@ SimcomCmdQueue create_start_mqtt_queue()
 SimcomCmdQueue create_send_msg_queue()
 {
     SimcomCmdQueue queue = SimcomCmdQueue(cmd_queue_type_e::EMPTY);
+
+    Casend casend_cmd = Casend(CASEND, CMD_action_enum::WRITE, "HELLO", 5);
+    Command cmd = (Command)casend_cmd;
+    casend_cmd.add_value(Value((int)0));
+    casend_cmd.add_value(Value((int)5));
+    queue.enqueue(cmd);
+    queue.enqueue_casend(casend_cmd);
+
+    cmd = Command(CAACK, CMD_action_enum::WRITE);
+    cmd.add_value(Value((int)0));
+    queue.enqueue(cmd);
+
+    cmd = Command(CARECV, CMD_action_enum::WRITE);
+    cmd.add_value(Value((int)0));
+    cmd.add_value(Value((int)100));
+    queue.enqueue(cmd);
+
     return queue;
 }

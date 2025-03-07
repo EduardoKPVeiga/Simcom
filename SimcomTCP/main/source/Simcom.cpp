@@ -39,7 +39,7 @@ bool Simcom::send()
     while (!cmd_queue.is_empty())
     {
         cmd = cmd_queue.dequeue();
-        if (mtw_str::StrContainsSubstr((char *)(cmd.cmd), CASEND, SIZE(CASEND), SIZE(CASEND) >= 0))
+        if (mtw_str::StrContainsSubstr((char *)(cmd.cmd), (char *)CASEND, SIZE(CASEND), SIZE(CASEND) >= 0))
         {
             casend_cmd = cmd_queue.dequeue_casend();
             casend_cmd.build(msg_send, &size);
