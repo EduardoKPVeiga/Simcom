@@ -7,6 +7,7 @@
 #include "pins.h"
 #include "Simcom.h"
 #include "mtw_str.h"
+#include "MqttPacket.h"
 
 // Main application task
 #define MAIN_TASK_STACK_SIZE 10 * 1024
