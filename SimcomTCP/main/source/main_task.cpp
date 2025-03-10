@@ -118,6 +118,9 @@ SimcomCmdQueue create_start_mqtt_queue()
     cmd.add_value(Value((int)1883));
     queue.enqueue(cmd);
 
+    cmd = Command(CASTATE, CMD_action_enum::READ);
+    queue.enqueue(cmd);
+
     MqttPacket packet = MqttPacket("SNTESTE", "teste");
     packet.create_connect_packet("SNTESTE", "SNTESTE", "SNTESTE");
     Casend casend_cmd = Casend(CASEND, CMD_action_enum::WRITE, packet.buffer, packet.buffer_size);
@@ -144,6 +147,9 @@ SimcomCmdQueue create_send_msg_queue()
     cmd.add_value(Value("TCP"));
     cmd.add_value(Value("172.104.199.107"));
     cmd.add_value(Value((int)1883));
+    queue.enqueue(cmd);
+
+    cmd = Command(CASTATE, CMD_action_enum::READ);
     queue.enqueue(cmd);
 
     MqttPacket packet = MqttPacket("SNTESTE", "teste");
