@@ -4,7 +4,7 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "freertos/queue.h"
-#include "pins.h"
+#include "esp_log.h"
 #include "Simcom.h"
 #include "mtw_str.h"
 #include "MqttPacket.h"
@@ -22,8 +22,7 @@ typedef enum main_task_message
     START_MQTT,
     SEND_MSG,
     RESTART_DEVICE,
-    UART_DATA_RECEIVED,
-    SS_ISR
+    SIMCOM_PRW_ON
 } main_task_message_e;
 
 typedef struct main_task_queue_message

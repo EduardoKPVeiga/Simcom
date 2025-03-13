@@ -56,36 +56,53 @@ int MqttPacket::create_subscribe_packet(uint16_t id)
 
 int MqttPacket::create_connect_packet(char *client_id, char *username, char *password)
 {
-    int remaining_length = 2 + 6 + strlen(client_id) + 2 + strlen(username) + 2 + strlen(password); // Protocol name + Protocol level + Connect flags + Keep alive + Client ID + Username + Password
+    if (!client_id)
+    {
+        return -1; // Retorna erro se o client_id for NULL
+    }
+
+    int client_id_len = strlen(client_id);
+
+    if (client_id_len > 23)
+    {              // Limite padrão para muitos brokers
+        return -2; // Código de erro para client_id muito grande
+    }
+
+    int remaining_length = 12 + (2 + client_id_len);
+
+    if (remaining_length > 127)
+    {
+        return -3; // Tamanho excede o limite simples do protocolo MQTT
+    }
 
     buffer[0] = 0x10; // MQTT CONNECT header
     buffer[1] = remaining_length;
 
-    buffer[2] = 0x00; // Protocol name length MSB
-    buffer[3] = 0x04; // Protocol name length LSB
-    buffer[4] = 'M';  // Protocol name
-    buffer[5] = 'Q';  // Protocol name
-    buffer[6] = 'T';  // Protocol name
-    buffer[7] = 'T';  // Protocol name
+    // Protocol Name "MQIsdp" (MQTT 3.1)
+    buffer[2] = 0x00;
+    buffer[3] = 0x06;
+    buffer[4] = 'M';
+    buffer[5] = 'Q';
+    buffer[6] = 'I';
+    buffer[7] = 's';
+    buffer[8] = 'd';
+    buffer[9] = 'p';
 
-    buffer[8] = 0x04; // Protocol level (4)
+    buffer[10] = 0x03; // Protocol level (MQTT 3.1)
 
-    buffer[9] = 0x02;  // Connect flags (Clean session)
-    buffer[10] = 0x00; // Keep alive MSB
-    buffer[11] = 0x3C; // Keep alive LSB (60 seconds)
+    buffer[11] = 0x02; // Flags de conexão (Clean Session)
 
-    buffer[12] = 0x00;                                 // Client ID length MSB
-    buffer[13] = strlen(client_id);                    // Client ID length LSB
-    memcpy(&buffer[14], client_id, strlen(client_id)); // Client ID
+    buffer[12] = 0x00;
+    buffer[13] = 0x3C; // Keep Alive de 60 segundos
 
-    buffer[14 + strlen(client_id)] = 0x00;                               // Username length MSB
-    buffer[15 + strlen(client_id)] = strlen(username);                   // Username length LSB
-    memcpy(&buffer[16 + strlen(client_id)], username, strlen(username)); // Username
+    int index = 14;
 
-    buffer[16 + strlen(client_id) + strlen(username)] = 0x00;                               // Password length MSB
-    buffer[17 + strlen(client_id) + strlen(username)] = strlen(password);                   // Password length LSB
-    memcpy(&buffer[18 + strlen(client_id) + strlen(username)], password, strlen(password)); // Password
+    // Client ID
+    buffer[index++] = (client_id_len >> 8) & 0xFF;
+    buffer[index++] = client_id_len & 0xFF;
+    memcpy(&buffer[index], client_id, client_id_len);
+    index += client_id_len;
 
-    buffer_size = 18 + strlen(client_id) + strlen(username) + strlen(password); // Total packet size
+    buffer_size = index; // Atualiza o tamanho total do buffer
     return buffer_size;
 }

@@ -18,15 +18,17 @@ Simcom::~Simcom()
 bool Simcom::power(bool pwr)
 {
     bool v = true;
-    simcomUart.close();
+    // simcomUart.close();
     v = pwr ? pwrkey_power_on() : pwrkey_power_off();
-    simcomUart.open();
+    // simcomUart.open();
     return v;
 }
 
 void Simcom::set_queue(SimcomCmdQueue queue)
 {
+    cmd_queue.clear();
     cmd_queue = queue;
+    simcomUart.simcom_resp_list.clear();
 }
 
 bool Simcom::send()
@@ -53,11 +55,27 @@ bool Simcom::send()
             cmd.build(msg_send, &size);
             simcomUart.send(msg_send, (size_t)size);
             vTaskDelay(1000 / portTICK_PERIOD_MS);
-
             SimcomResp resp = simcomUart.get_resp(cmd);
+
+            if (mtw_str::StrContainsSubstr((char *)(cmd.cmd), CARECV, SIZE(CARECV), SIZE(CARECV)) >= 0)
+            {
+                cout << "Received: " << resp.msg << endl;
+                char r[4] = {0, 0, 0, 0};
+                uint16_t index = resp.msg.find(',') + 1;
+
+                for (int i = 0; i < 4; i++)
+                {
+                    r[i] = resp.msg[index + i];
+                }
+                cout << "HEX: " << mtw_str::to_hex_string(r, 4) << endl
+                     << endl;
+            }
+
             // Validar resposta
             if (!resp.valid(cmd))
+            {
                 return false;
+            }
         }
     }
     return true;

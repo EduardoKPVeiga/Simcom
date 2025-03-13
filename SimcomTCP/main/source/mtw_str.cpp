@@ -51,6 +51,7 @@ string mtw_str::to_hex_string(char *char_array, int char_array_size)
 
         str += hex_chars[(byte & 0xF0) >> 4];
         str += hex_chars[(byte & 0x0F) >> 0];
+        str += ' ';
     }
     str += '\0';
     return str;

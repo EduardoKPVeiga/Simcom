@@ -71,7 +71,7 @@
 #define RESP_ACTIVE "ACTIVE"
 #define RESP_READY "READY"
 #define RESP_NOT_READY "NOT READY"
-#define RESP_SMS_READY "SMS Ready"
+#define SMS_READY "SMS Ready"
 #define ENTER_PSM "ENTER PSM"
 #define EXIT_PSM "EXIT PSM"
 #define NORMAL_POWER_DOWN "NORMAL POWER DOWN"
@@ -273,7 +273,6 @@ enum GNSS_get_location_failed
 #define ASYNCMODE "ASYNCMODE"
 
 #define SMCONN_RESP_TRUE "+SMCONN: 1"
-#define SMS_READY "SMS Ready"
 
 // Mqtt connect function
 #define DELAY_SMCONN_ATTEMPT 10 / portTICK_PERIOD_MS
@@ -317,10 +316,6 @@ enum Thread_action_enum
 #define CPSMCFG "+CPSMCFG"       // Configure minimum threshold value
 #define CFUN "+CFUN"             // Set Phone Functionality
 #define CPIN "+CPIN"             // SIM card status
-#define CASSLCFG "+CASSLCFG"     // SSL configure
-#define CASEND "+CASEND"         // Request to send data through TCP/UDP
-#define CAACK "+CAACK"           // Query send data information
-#define CARECV "+CARECV"         // Receive Data via an Established Connection
 
 #define CNACT "+CNACT" // APP network active
 #define CMNB "+CMNB"   // Preferred selection between CAT-M and NB-IoT
@@ -381,10 +376,15 @@ enum Network_select_enum
 
 // gsm_tcp_udp_cmd ========================================================================
 // TCP/UDP
-#define CACFG "+CACFG"     // configure transparent transmission parameters
-#define CAOPEN "+CAOPEN"   // Open a TCP/UDP connection
-#define CACLOSE "+CACLOSE" // Close a TCP/UDP connection
-#define CASTATE "+CASTATE" // Query TCP/UDP connection state
+#define CACFG "+CACFG"         // configure transparent transmission parameters
+#define CAOPEN "+CAOPEN"       // Open a TCP/UDP connection
+#define CACLOSE "+CACLOSE"     // Close a TCP/UDP connection
+#define CASTATE "+CASTATE"     // Query TCP/UDP connection state
+#define CASSLCFG "+CASSLCFG"   // SSL configure
+#define CASEND "+CASEND"       // Request to send data through TCP/UDP
+#define CAACK "+CAACK"         // Query send data information
+#define CARECV "+CARECV"       // Receive Data via an Established Connection
+#define CADATAIND "+CADATAIND" // Data indication
 
 #define KEEPALIVE "KEEPALIVE"
 // ========================================================================================

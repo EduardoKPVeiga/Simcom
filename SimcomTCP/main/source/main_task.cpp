@@ -1,4 +1,7 @@
 #include "main_task.h"
+#include "pins.h"
+
+#define TAG "main"
 
 // Queue handle used to manipulate the main queue of events
 static QueueHandle_t main_task_queue_handle;
@@ -32,7 +35,6 @@ void main_task(void *pvParameters)
     simcom.power(true);
 
     main_task_send_message(START_MQTT);
-    main_task_send_message(SEND_MSG);
 
     for (;;)
     {
@@ -42,11 +44,19 @@ void main_task(void *pvParameters)
             {
 
             case START_MQTT:
+                ESP_LOGI(TAG, "START_MQTT");
                 simcom.set_queue(create_start_mqtt_queue());
-                simcom.send();
+                if (!simcom.send())
+                {
+                    ESP_LOGE(TAG, "Error sending message.");
+                    main_task_send_message(START_MQTT);
+                }
+                // else
+                //     main_task_send_message(SEND_MSG);
                 break;
 
             case SEND_MSG:
+                ESP_LOGI(TAG, "SEND_MSG");
                 simcom.set_queue(create_send_msg_queue());
                 simcom.send();
                 vTaskDelay(5000 / portTICK_PERIOD_MS);
@@ -58,10 +68,12 @@ void main_task(void *pvParameters)
                 esp_restart();
                 break;
 
-            case UART_DATA_RECEIVED:
-                break;
-
-            case SS_ISR:
+            case SIMCOM_PRW_ON:
+                ESP_LOGW(TAG, "SIMCOM_PRW_ON");
+                simcom.power(true);
+                xQueueReset(main_task_queue_handle);
+                vTaskDelay(5000 / portTICK_PERIOD_MS);
+                main_task_send_message(START_MQTT);
                 break;
 
             default:
@@ -121,14 +133,19 @@ SimcomCmdQueue create_start_mqtt_queue()
     cmd = Command(CASTATE, CMD_action_enum::READ);
     queue.enqueue(cmd);
 
-    MqttPacket packet = MqttPacket("SNTESTE", "teste");
-    packet.create_connect_packet("SNTESTE", "SNTESTE", "SNTESTE");
+    MqttPacket packet = MqttPacket("S1mC0M5", "teste");
+    packet.create_connect_packet("S1mC0M5", "user", "password");
     Casend casend_cmd = Casend(CASEND, CMD_action_enum::WRITE, packet.buffer, packet.buffer_size);
     cmd = (Command)casend_cmd;
     casend_cmd.add_value(Value((int)0));
     casend_cmd.add_value(Value((int)packet.buffer_size));
     queue.enqueue(cmd);
     queue.enqueue_casend(casend_cmd);
+
+    cmd = Command(CARECV, CMD_action_enum::WRITE);
+    cmd.add_value(Value((int)0));
+    cmd.add_value(Value((int)4));
+    queue.enqueue(cmd);
 
     cmd = Command(CACLOSE, CMD_action_enum::WRITE);
     cmd.add_value(Value((int)0));

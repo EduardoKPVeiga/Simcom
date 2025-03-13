@@ -22,6 +22,8 @@ public:
     SimcomCmdQueue(cmd_queue_type_e t);
     ~SimcomCmdQueue();
 
+    void clear();
+    int size();
     void enqueue(Command cmd);
     Command dequeue();
     void enqueue_casend(Casend cmd);

@@ -18,13 +18,14 @@ using namespace std;
 class SimcomResp
 {
 private:
-    void extract_msg(string data, uint16_t size);
-    void extract_from(string data, uint16_t size);
+    void extract_msg(string data, size_t size);
+    void extract_from(string data, size_t size);
 
 public:
     string from;
     string msg;
-    uint16_t size;
+    uint16_t size_f;
+    uint16_t size_m;
     uint8_t not_used;
 
     /**
@@ -37,18 +38,9 @@ public:
      * Constructor
      * @author EKPV
      * @param data : string
-     * @param _size : size_t
+     * @param size : size_t
      */
-    SimcomResp(string data, size_t _size);
-
-    /**
-     * Constructor
-     * @author EKPV
-     * @param _msg : string
-     * @param _from : string
-     * @param _size : uint16_t
-     */
-    SimcomResp(string _msg, string _from, uint16_t _size);
+    SimcomResp(string data, size_t size);
 
     /**
      * Destructor

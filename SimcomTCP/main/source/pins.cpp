@@ -1,5 +1,6 @@
 #include "pins.h"
 #include "mtw_str.h"
+#include "main_task.h"
 
 uint8_t ioexp = 0;
 SemaphoreHandle_t sensors_semaphore;
@@ -16,7 +17,7 @@ void pins_init(void)
     set_pin(PIN_SCL, GPIO_MODE_OUTPUT, GPIO_INTR_DISABLE, NULL, NULL);
     set_pin(PIN_SDA, GPIO_MODE_OUTPUT, GPIO_INTR_DISABLE, NULL, NULL);
     set_pin(PIN_RST_MOD, GPIO_MODE_INPUT, GPIO_INTR_DISABLE, NULL, NULL);
-    set_pin(PIN_SIMCOM_STATUS, GPIO_MODE_INPUT, GPIO_INTR_DISABLE, NULL, NULL);
+    set_pin(PIN_SIMCOM_STATUS, GPIO_MODE_INPUT, GPIO_INTR_POSEDGE, simcom_status_isr_handler, NULL);
     set_pin(PIN_SIMCOM_RX, GPIO_MODE_INPUT, GPIO_INTR_DISABLE, NULL, NULL);
     set_pin(PIN_SIMCOM_TX, GPIO_MODE_INPUT, GPIO_INTR_DISABLE, NULL, NULL);
 
@@ -213,4 +214,9 @@ esp_err_t pca9535_read(uint8_t command, uint8_t *data)
         xSemaphoreGive(sensors_semaphore);
     }
     return error;
+}
+
+void IRAM_ATTR simcom_status_isr_handler(void *args)
+{
+    main_task_send_message_from_isr(SIMCOM_PRW_ON);
 }

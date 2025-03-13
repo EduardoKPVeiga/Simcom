@@ -6,6 +6,7 @@
 #include "pins.h"
 #include <string>
 #include <queue>
+#include "esp_log.h"
 
 #include "simcom_definitions.h"
 #include "mtw_str.h"
@@ -29,8 +30,7 @@ private:
 
     static void config();
     static void simcom_uart_task(void *pvParameters);
-    static void smsub_received(char *msg, size_t size);
-    static void msg_received(string msg, size_t size, bool *big_receive, string *last_msg);
+    static void msg_received(string msg, size_t *total_size, size_t size, string *last_msg);
 
 public:
     static volatile bool received;

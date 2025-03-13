@@ -56,5 +56,6 @@ esp_err_t i2c_init(void);
 esp_err_t pca9535_init();
 esp_err_t pca9535_write(uint8_t command, uint8_t data);
 esp_err_t pca9535_read(uint8_t command, uint8_t *data);
+void IRAM_ATTR simcom_status_isr_handler(void *args);
 
 #endif // PINS_H

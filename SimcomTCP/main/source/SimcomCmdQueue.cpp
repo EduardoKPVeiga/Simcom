@@ -10,6 +10,17 @@ SimcomCmdQueue::~SimcomCmdQueue()
         cmd_queue.pop();
 }
 
+void SimcomCmdQueue::clear()
+{
+    while (!cmd_queue.empty())
+        cmd_queue.pop();
+}
+
+int SimcomCmdQueue::size()
+{
+    return cmd_queue.size();
+}
+
 void SimcomCmdQueue::enqueue(Command cmd)
 {
     cmd_queue.push(cmd);
