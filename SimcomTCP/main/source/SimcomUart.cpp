@@ -56,12 +56,11 @@ void SimcomUart::send(const char *data, size_t size)
 void SimcomUart::simcom_uart_task(void *pvParameters)
 {
     uart_event_t event;
-    bool big_receive = false;
     char raw_msg_received[MSG_RECEIVED_BUFF_SIZE] = {0};
-    string last_msg = "";
+    list<string> msg_list = list<string>();
     string msg = "";
-    size_t total_size = 0;
-    size_t event_size = 0;
+    int index = 0;
+    bool waiting = false;
 
     for (;;)
     {
@@ -70,12 +69,34 @@ void SimcomUart::simcom_uart_task(void *pvParameters)
             switch (event.type)
             {
             case UART_DATA:
-                event_size = event.size;
-                uart_read_bytes(uart_num, raw_msg_received, event_size, portMAX_DELAY);
-                mtw_str::remove_char(raw_msg_received, &event_size, '\0');
-                mtw_str::remove_char(raw_msg_received, &event_size, '\r');
-                msg = string(raw_msg_received, event_size);
-                msg_received(msg, &total_size, event_size, &last_msg);
+                uart_read_bytes(uart_num, raw_msg_received, event.size, portMAX_DELAY);
+                index = mtw_str::StrContainsChar(raw_msg_received, '\0', event.size);
+                if (index >= 0)
+                {
+                    msg = string(raw_msg_received, index);
+                    msg_list.push_back(msg);
+                    if (index + 1 < event.size - 3)
+                    {
+                        msg = string(&raw_msg_received[index + 1], event.size - index - 1);
+                        msg_list.push_back(msg);
+                    }
+                    else
+                        waiting = true;
+                }
+                else
+                {
+                    msg = string(raw_msg_received, event.size);
+                    msg_list.push_back(msg);
+                    if (waiting && (msg.contains(RESP_OK) || msg.contains(RESP_ERROR)))
+                        waiting = false;
+                }
+                if (!waiting)
+                {
+                    for (auto &it : msg_list)
+                        ESP_LOGI(TAG, "Received: %s", it.c_str());
+                    simcom_resp_list.add(SimcomResp(msg_list));
+                    msg_list.clear();
+                }
                 break;
 
             case UART_FIFO_OVF:
@@ -103,62 +124,6 @@ void SimcomUart::simcom_uart_task(void *pvParameters)
         }
     }
     vTaskDelete(NULL);
-}
-
-void SimcomUart::msg_received(string msg, size_t *total_size, size_t size, string *last_msg)
-{
-    if (msg.contains(SGNSERR) || msg.contains(SMS_READY) || msg.contains(NORMAL_POWER_DOWN))
-    {
-        SimcomResp resp = SimcomResp(msg, size);
-        simcom_resp_list.add(resp);
-        *last_msg = "";
-        *total_size = 0;
-        return;
-    }
-
-    if (msg.contains("AT+"))
-    {
-        *last_msg = msg;
-        *total_size = size;
-        if (msg.contains(RESP_OK) || msg.contains(RESP_ERROR))
-        {
-            SimcomResp resp = SimcomResp(msg, size);
-            simcom_resp_list.add(resp);
-            *last_msg = "";
-            *total_size = 0;
-            return;
-        }
-    }
-    else
-    {
-        if ((*last_msg).contains("AT+"))
-        {
-            *last_msg += msg;
-            *total_size += size;
-            if (msg.contains(RESP_OK) || msg.contains(RESP_ERROR))
-            {
-                SimcomResp resp = SimcomResp(*last_msg, *total_size);
-                simcom_resp_list.add(resp);
-                *last_msg = "";
-                *total_size = 0;
-                return;
-            }
-        }
-        else if (msg.contains('+'))
-        {
-            SimcomResp resp = SimcomResp(msg, size);
-            simcom_resp_list.add(resp);
-            *last_msg = "";
-            *total_size = 0;
-            // cout << "3===========================" << endl
-            //      << "---------- From " << endl
-            //      << resp.from << endl
-            //      << "---------- Received" << endl
-            //      << resp.msg << endl
-            //      << "============================" << endl;
-            return;
-        }
-    }
 }
 
 SimcomResp SimcomUart::get_resp(Command cmd)

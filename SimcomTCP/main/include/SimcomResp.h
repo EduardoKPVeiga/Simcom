@@ -37,10 +37,9 @@ public:
     /**
      * Constructor
      * @author EKPV
-     * @param data : string
-     * @param size : size_t
+     * @param data : list<string>
      */
-    SimcomResp(string data, size_t size);
+    SimcomResp(list<string> data);
 
     /**
      * Destructor
