@@ -18,6 +18,7 @@ public:
     char topic[MAX_NUM_CHAR_SEND_BUFF];
     char payload[MAX_NUM_CHAR_SEND_BUFF];
 
+    MqttPacket();
     MqttPacket(const char *t, const char *p);
     ~MqttPacket();
 
@@ -26,7 +27,7 @@ public:
 
     int create_publish_packet();
     int create_subscribe_packet(uint16_t id);
-    int create_connect_packet(char *client_id, char *username, char *password);
+    int create_connect_packet(char *client_id);
 };
 
 #endif // MQTTPACKET_H

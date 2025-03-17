@@ -73,7 +73,10 @@ bool Simcom::send()
                     {
                         r[i] = resp.msg[index + i];
                     }
+                    cout << "Size: " << size << endl
+                         << "HEX: " << mtw_str::to_hex_string(r, size) << endl;
                     ack = MqttMsgAck(r, size);
+                    ack.decode();
                 }
             }
 

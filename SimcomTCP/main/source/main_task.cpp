@@ -51,8 +51,8 @@ void main_task(void *pvParameters)
                     ESP_LOGE(TAG, "Error sending message.");
                     main_task_send_message(START_MQTT);
                 }
-                // else
-                //     main_task_send_message(SEND_MSG);
+                else
+                    main_task_send_message(SEND_MSG);
                 break;
 
             case SEND_MSG:
@@ -133,8 +133,8 @@ SimcomCmdQueue create_start_mqtt_queue()
     cmd = Command(CASTATE, CMD_action_enum::READ);
     queue.enqueue(cmd);
 
-    MqttPacket packet = MqttPacket("S1mC0M5", "teste");
-    packet.create_connect_packet("S1mC0M5", "user", "password");
+    MqttPacket packet = MqttPacket("S1mC0M5/1", "teste");
+    packet.create_connect_packet("S1mC0M5");
     Casend casend_cmd = Casend(CASEND, CMD_action_enum::WRITE, packet.buffer, packet.buffer_size);
     cmd = (Command)casend_cmd;
     casend_cmd.add_value(Value((int)0));
@@ -145,6 +145,19 @@ SimcomCmdQueue create_start_mqtt_queue()
     cmd = Command(CARECV, CMD_action_enum::WRITE);
     cmd.add_value(Value((int)0));
     cmd.add_value(Value((int)4));
+    queue.enqueue(cmd);
+
+    packet.create_subscribe_packet(1);
+    casend_cmd = Casend(CASEND, CMD_action_enum::WRITE, packet.buffer, packet.buffer_size);
+    cmd = (Command)casend_cmd;
+    casend_cmd.add_value(Value((int)0));
+    casend_cmd.add_value(Value((int)packet.buffer_size));
+    queue.enqueue(cmd);
+    queue.enqueue_casend(casend_cmd);
+
+    cmd = Command(CARECV, CMD_action_enum::WRITE);
+    cmd.add_value(Value((int)0));
+    cmd.add_value(Value((int)5));
     queue.enqueue(cmd);
 
     cmd = Command(CACLOSE, CMD_action_enum::WRITE);
@@ -169,7 +182,7 @@ SimcomCmdQueue create_send_msg_queue()
     cmd = Command(CASTATE, CMD_action_enum::READ);
     queue.enqueue(cmd);
 
-    MqttPacket packet = MqttPacket("SNTESTE", "teste");
+    MqttPacket packet = MqttPacket("S1mC0M5/1", "teste");
     packet.create_publish_packet();
     Casend casend_cmd = Casend(CASEND, CMD_action_enum::WRITE, packet.buffer, packet.buffer_size);
     cmd = (Command)casend_cmd;

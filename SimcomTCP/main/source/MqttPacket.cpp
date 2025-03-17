@@ -1,9 +1,13 @@
 #include "MqttPacket.h"
 
-MqttPacket::MqttPacket(const char *t, const char *p) : buffer_size(0),
-                                                       topic_size(0),
-                                                       payload_size(0),
-                                                       packet_id(0)
+MqttPacket::MqttPacket() : buffer_size(0),
+                           topic_size(0),
+                           payload_size(0),
+                           packet_id(0)
+{
+}
+
+MqttPacket::MqttPacket(const char *t, const char *p) : MqttPacket()
 {
     topic_size = strlen(t);
     payload_size = strlen(p);
@@ -18,43 +22,59 @@ MqttPacket::~MqttPacket()
 
 int MqttPacket::create_publish_packet()
 {
-    int remaining_length = 2 + topic_size + payload_size; // Topic length (2 bytes) + topic + payload
+    int remaining_length = 2 + topic_size + payload_size; // Tamanho correto do pacote
 
-    buffer[0] = 0x30;             // MQTT PUBLISH header (QoS 0, no retain)
-    buffer[1] = remaining_length; // Remaining length field
+    if (remaining_length > 127)
+    {
+        return -2; // Erro: tamanho excede o limite de um único byte no campo Remaining Length
+    }
+
+    // buffer[0] = 0x30;             // MQTT PUBLISH header (QoS 0, no retain)
+    buffer[0] = 0x32;             // MQTT PUBLISH header (QoS 1)
+    buffer[1] = remaining_length; // Remaining length
 
     buffer[2] = (topic_size >> 8) & 0xFF; // Topic Length MSB
     buffer[3] = topic_size & 0xFF;        // Topic Length LSB
 
-    memcpy(&buffer[4], topic, topic_size);                  // Copy topic name into the buffer
-    memcpy(&buffer[4 + topic_size], payload, payload_size); // Copy payload into the buffer
+    memcpy(&buffer[4], topic, topic_size); // Copia o nome do tópico
 
-    buffer_size = 4 + topic_size + payload_size; // Return total packet size
+    int msg_id = 10;
+    buffer[4 + topic_size] = (msg_id >> 8) & 0xFF; // Topic Length MSB
+    buffer[4 + topic_size + 1] = msg_id & 0xFF;    // Topic Length LSB
+
+    memcpy(&buffer[4 + topic_size + 2], payload, payload_size); // Copia o payload
+
+    buffer_size = 4 + topic_size + payload_size; // Atualiza o tamanho total do buffer
     return buffer_size;
 }
 
 int MqttPacket::create_subscribe_packet(uint16_t id)
 {
     packet_id = id;
-    int remaining_length = 2 + 2 + topic_size + 1; // Packet ID (2 bytes) + Topic Length (2 bytes) + Topic + QoS (1 byte)
+    int remaining_length = 2 + 2 + topic_size + 1; // ID do pacote (2 bytes) + Tamanho do tópico (2 bytes) + Tópico + QoS (1 byte)
 
-    buffer[0] = 0x82; // MQTT SUBSCRIBE header
-    buffer[1] = remaining_length;
+    if (remaining_length > 127)
+    {
+        return -2; // Erro: tamanho excede o limite de um único byte no campo Remaining Length
+    }
+
+    buffer[0] = 0x82;             // MQTT SUBSCRIBE header
+    buffer[1] = remaining_length; // Remaining length
 
     buffer[2] = (packet_id >> 8) & 0xFF; // Packet ID MSB
     buffer[3] = packet_id & 0xFF;        // Packet ID LSB
 
     buffer[4] = (topic_size >> 8) & 0xFF;  // Topic Length MSB
     buffer[5] = topic_size & 0xFF;         // Topic Length LSB
-    memcpy(&buffer[6], topic, topic_size); // Topic
+    memcpy(&buffer[6], topic, topic_size); // Copia o nome do tópico
 
-    buffer[6 + topic_size] = 0x00; // QoS 0 (At most once)
+    buffer[6 + topic_size] = 0x00; // QoS 0 (Entrega no máximo uma vez)
 
-    buffer_size = 7 + topic_size; // Total packet size
+    buffer_size = 7 + topic_size; // Atualiza o tamanho total do buffer
     return buffer_size;
 }
 
-int MqttPacket::create_connect_packet(char *client_id, char *username, char *password)
+int MqttPacket::create_connect_packet(char *client_id)
 {
     if (!client_id)
     {

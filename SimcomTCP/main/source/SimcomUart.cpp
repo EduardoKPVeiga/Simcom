@@ -128,6 +128,9 @@ SimcomResp SimcomUart::get_resp(Command cmd)
 {
     SimcomResp resp = SimcomResp();
     if (!simcom_resp_list.empty())
+    {
         resp = simcom_resp_list.get(string(cmd.cmd));
+        simcom_resp_list.remove(string(cmd.cmd));
+    }
     return resp;
 }

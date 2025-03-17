@@ -54,6 +54,7 @@ private:
     uint8_t retain;
     uint16_t remaining_length;
     connect_return_code_e connack_code;
+    uint16_t packet_id;
 
 public:
     MqttMsgAck();
