@@ -33,8 +33,9 @@ void Simcom::set_queue(SimcomCmdQueue queue)
 
 bool Simcom::send()
 {
-    Command cmd;
-    Casend casend_cmd;
+    Command cmd = Command();
+    Casend casend_cmd = Casend();
+    MqttMsgAck ack = MqttMsgAck();
     uint16_t size = 0;
     char msg_send[MAX_NUM_CHAR_SEND_BUFF] = {0};
 
@@ -59,16 +60,21 @@ bool Simcom::send()
 
             if (mtw_str::StrContainsSubstr((char *)(cmd.cmd), CARECV, SIZE(CARECV), SIZE(CARECV)) >= 0)
             {
-                cout << "Received: " << resp.msg << endl;
-                char r[4] = {0, 0, 0, 0};
-                uint16_t index = resp.msg.find(',') + 1;
-
-                for (int i = 0; i < 4; i++)
+                if (!resp.msg.contains(RESP_ERROR))
                 {
-                    r[i] = resp.msg[index + i];
+                    // +CARECV: <size>,<data>
+                    uint16_t index = resp.msg.find(':') + 2;
+                    uint16_t comma_pos = resp.msg.find(',');
+                    string s = resp.msg.substr(index, comma_pos - index);
+                    int size = stoi(s);
+                    char *r = new char[size];
+                    index = comma_pos + 1;
+                    for (int i = 0; i < size; i++)
+                    {
+                        r[i] = resp.msg[index + i];
+                    }
+                    ack = MqttMsgAck(r, size);
                 }
-                cout << "HEX: " << mtw_str::to_hex_string(r, 4) << endl
-                     << endl;
             }
 
             // Validar resposta

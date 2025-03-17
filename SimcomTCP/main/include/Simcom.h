@@ -1,10 +1,10 @@
 #ifndef SIMCOM_H
 #define SIMCOM_H
 
-// #include "Lte.h"
 #include "SimcomUart.h"
 #include "SimcomCmdQueue.h"
 #include "simcom_definitions.h"
+#include "MqttMsgAck.h"
 
 #define SN_SIZE 7
 

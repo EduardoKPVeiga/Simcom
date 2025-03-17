@@ -92,8 +92,6 @@ void SimcomUart::simcom_uart_task(void *pvParameters)
                 }
                 if (!waiting)
                 {
-                    for (auto &it : msg_list)
-                        ESP_LOGI(TAG, "Received: %s", it.c_str());
                     simcom_resp_list.add(SimcomResp(msg_list));
                     msg_list.clear();
                 }
