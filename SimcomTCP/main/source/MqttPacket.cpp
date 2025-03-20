@@ -112,8 +112,9 @@ int MqttPacket::create_connect_packet(char *client_id)
 
     buffer[11] = 0x02; // Flags de conexão (Clean Session)
 
-    buffer[12] = 0x00;
-    buffer[13] = 0x3C; // Keep Alive de 60 segundos
+    uint16_t keep_alive = 600;
+    buffer[12] = keep_alive >> 8;   // Keep Alive MSB
+    buffer[13] = keep_alive & 0xFF; // Keep Alive LSB
 
     int index = 14;
 

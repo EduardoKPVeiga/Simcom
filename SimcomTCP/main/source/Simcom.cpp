@@ -5,7 +5,7 @@ Simcom::Simcom() : simcomUart(SimcomUart()), cmd_queue(SimcomCmdQueue(cmd_queue_
     simcomUart.open();
 }
 
-Simcom::Simcom(unsigned char sn[SN_SIZE]) : simcomUart(SimcomUart()), cmd_queue(SimcomCmdQueue(cmd_queue_type_e::EMPTY))
+Simcom::Simcom(unsigned char sn[SN_SIZE]) : Simcom()
 {
     memcpy(serial_num, sn, SN_SIZE);
     simcomUart.open();

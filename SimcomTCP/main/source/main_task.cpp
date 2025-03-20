@@ -147,7 +147,7 @@ SimcomCmdQueue create_start_mqtt_queue()
     cmd.add_value(Value((int)4));
     queue.enqueue(cmd);
 
-    packet.create_subscribe_packet(1);
+    packet.create_subscribe_packet(1564);
     casend_cmd = Casend(CASEND, CMD_action_enum::WRITE, packet.buffer, packet.buffer_size);
     cmd = (Command)casend_cmd;
     casend_cmd.add_value(Value((int)0));
@@ -160,9 +160,17 @@ SimcomCmdQueue create_start_mqtt_queue()
     cmd.add_value(Value((int)5));
     queue.enqueue(cmd);
 
-    cmd = Command(CACLOSE, CMD_action_enum::WRITE);
-    cmd.add_value(Value((int)0));
-    queue.enqueue(cmd);
+    // packet.create_publish_packet();
+    // casend_cmd = Casend(CASEND, CMD_action_enum::WRITE, packet.buffer, packet.buffer_size);
+    // cmd = (Command)casend_cmd;
+    // casend_cmd.add_value(Value((int)0));
+    // casend_cmd.add_value(Value((int)packet.buffer_size));
+    // queue.enqueue(cmd);
+    // queue.enqueue_casend(casend_cmd);
+
+    // cmd = Command(CACLOSE, CMD_action_enum::WRITE);
+    // cmd.add_value(Value((int)0));
+    // queue.enqueue(cmd);
 
     return queue;
 }
@@ -171,29 +179,35 @@ SimcomCmdQueue create_send_msg_queue()
 {
     SimcomCmdQueue queue = SimcomCmdQueue(cmd_queue_type_e::EMPTY);
 
-    Command cmd = Command(CAOPEN, CMD_action_enum::WRITE);
-    cmd.add_value(Value((int)0));
-    cmd.add_value(Value((int)0));
-    cmd.add_value(Value("TCP"));
-    cmd.add_value(Value("172.104.199.107"));
-    cmd.add_value(Value((int)1883));
-    queue.enqueue(cmd);
+    // Command cmd = Command(CASSLCFG, CMD_action_enum::WRITE);
+    // cmd.add_value(Value((int)0));
+    // cmd.add_value(Value("SSL"));
+    // cmd.add_value(Value((int)0));
+    // queue.enqueue(cmd);
 
-    cmd = Command(CASTATE, CMD_action_enum::READ);
-    queue.enqueue(cmd);
+    // cmd = Command(CAOPEN, CMD_action_enum::WRITE);
+    // cmd.add_value(Value((int)0));
+    // cmd.add_value(Value((int)0));
+    // cmd.add_value(Value("TCP"));
+    // cmd.add_value(Value("172.104.199.107"));
+    // cmd.add_value(Value((int)1883));
+    // queue.enqueue(cmd);
+
+    // cmd = Command(CASTATE, CMD_action_enum::READ);
+    // queue.enqueue(cmd);
 
     MqttPacket packet = MqttPacket("S1mC0M5/1", "teste");
     packet.create_publish_packet();
     Casend casend_cmd = Casend(CASEND, CMD_action_enum::WRITE, packet.buffer, packet.buffer_size);
-    cmd = (Command)casend_cmd;
+    Command cmd = (Command)casend_cmd;
     casend_cmd.add_value(Value((int)0));
     casend_cmd.add_value(Value((int)packet.buffer_size));
     queue.enqueue(cmd);
     queue.enqueue_casend(casend_cmd);
 
-    cmd = Command(CACLOSE, CMD_action_enum::WRITE);
-    cmd.add_value(Value((int)0));
-    queue.enqueue(cmd);
+    // cmd = Command(CACLOSE, CMD_action_enum::WRITE);
+    // cmd.add_value(Value((int)0));
+    // queue.enqueue(cmd);
 
     return queue;
 }

@@ -6,11 +6,7 @@ SimcomResp::SimcomResp() : from(""),
                            size_m(0),
                            not_used(0) {}
 
-SimcomResp::SimcomResp(list<string> data) : from(""),
-                                            msg(""),
-                                            size_f(0),
-                                            size_m(0),
-                                            not_used(0)
+SimcomResp::SimcomResp(list<string> data) : SimcomResp()
 {
     string item;
     while (!data.empty())
