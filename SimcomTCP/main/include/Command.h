@@ -108,11 +108,9 @@ public:
     /**
      * Build command to send to GSM module
      * @author EKPV
-     * @param msg_send : char *
-     * @param size : uint16_t *
      * @return void
      */
-    void build(char *msg_send, uint16_t *size);
+    void build();
 };
 
 #endif /* COMMAND_H_ */

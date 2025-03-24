@@ -18,9 +18,9 @@ Simcom::~Simcom()
 bool Simcom::power(bool pwr)
 {
     bool v = true;
-    // simcomUart.close();
+    simcomUart.close();
     v = pwr ? pwrkey_power_on() : pwrkey_power_off();
-    // simcomUart.open();
+    simcomUart.open();
     return v;
 }
 
@@ -45,16 +45,16 @@ bool Simcom::send()
         if (mtw_str::StrContainsSubstr((char *)(cmd.cmd), CASEND, SIZE(CASEND), SIZE(CASEND)) >= 0)
         {
             casend_cmd = cmd_queue.dequeue_casend();
-            casend_cmd.build(msg_send, &size);
-            simcomUart.send(msg_send, (size_t)size);
+            casend_cmd.build();
+            simcomUart.send(casend_cmd.msg_send, casend_cmd.size);
             vTaskDelay(1000 / portTICK_PERIOD_MS);
             simcomUart.send(casend_cmd.data, casend_cmd.data_size);
             vTaskDelay(1000 / portTICK_PERIOD_MS);
         }
         else
         {
-            cmd.build(msg_send, &size);
-            simcomUart.send(msg_send, (size_t)size);
+            cmd.build();
+            simcomUart.send(cmd.msg_send, cmd.size);
             vTaskDelay(1000 / portTICK_PERIOD_MS);
             SimcomResp resp = simcomUart.get_resp(cmd);
 

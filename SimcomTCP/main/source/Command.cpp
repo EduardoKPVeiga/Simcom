@@ -57,38 +57,38 @@ Command::~Command()
     this->values.clear();
 }
 
-void Command::build(char *msg_send, uint16_t *size)
+void Command::build()
 {
     // Add begin command
-    (*size) = 0;
+    size = 0;
     for (int i = 0; i < SIZE(BEGIN_CMD); i++)
     {
         msg_send[i] = BEGIN_CMD[i];
-        (*size)++;
+        size++;
     }
 
     // Add command
     for (int i = 0; i < strlen(cmd); i++)
     {
-        msg_send[(*size)] = cmd[i];
-        (*size)++;
+        msg_send[size] = cmd[i];
+        size++;
     }
     if (this->action == WRITE)
     {
-        msg_send[(*size)] = WRITE_CMD[0];
-        (*size)++;
+        msg_send[size] = WRITE_CMD[0];
+        size++;
     }
     else if (action == READ)
     {
-        msg_send[(*size)] = READ_CMD[0];
-        (*size)++;
+        msg_send[size] = READ_CMD[0];
+        size++;
     }
     else if (action == TEST)
     {
-        msg_send[(*size)] = TEST_CMD[0];
-        (*size)++;
-        msg_send[(*size)] = TEST_CMD[1];
-        (*size)++;
+        msg_send[size] = TEST_CMD[0];
+        size++;
+        msg_send[size] = TEST_CMD[1];
+        size++;
     }
 
     // Add values
@@ -100,17 +100,17 @@ void Command::build(char *msg_send, uint16_t *size)
             const char *str = it->get_value_string().c_str();
 
             // Add quotation marks
-            msg_send[(*size)] = '"';
-            (*size)++;
+            msg_send[size] = '"';
+            size++;
             for (int i = 0; i < strlen(str); i++)
             {
-                msg_send[(*size)] = str[i];
-                (*size)++;
+                msg_send[size] = str[i];
+                size++;
             }
 
             // Add quotation marks
-            msg_send[(*size)] = '"';
-            (*size)++;
+            msg_send[size] = '"';
+            size++;
         }
         else if (it->get_type() == value_type_e::NUMBER)
         {
@@ -119,22 +119,22 @@ void Command::build(char *msg_send, uint16_t *size)
             const char *a = mtw_str::decimal_to_char_array(num);
             for (int i = 0; i < strlen(a); i++)
             {
-                msg_send[(*size)] = a[i];
-                (*size)++;
+                msg_send[size] = a[i];
+                size++;
             }
         }
-        msg_send[(*size)] = VALUE_DELIMITER[0];
-        (*size)++;
+        msg_send[size] = VALUE_DELIMITER[0];
+        size++;
     }
     if (this->action == WRITE)
-        (*size)--;
+        size--;
 
     // Add end command
-    int aux = (*size);
+    int aux = size;
     for (int i = 0; i < SIZE(END_CMD); i++)
     {
         msg_send[i + aux] = END_CMD[i];
-        (*size)++;
+        size++;
     }
 }
 
