@@ -23,6 +23,9 @@ public:
     bool power(bool pwr);
     void set_queue(SimcomCmdQueue queue);
     bool send();
+    SimcomResp send(Command cmd);
+    SimcomResp send(Casend cmd);
+    SimcomResp get_resp(Command cmd);
 };
 
 #endif // SIMCOM_H

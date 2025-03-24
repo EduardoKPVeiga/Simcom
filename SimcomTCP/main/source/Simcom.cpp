@@ -83,3 +83,44 @@ bool Simcom::send()
     }
     return true;
 }
+
+SimcomResp Simcom::send(Command cmd)
+{
+    cmd.build();
+    simcomUart.send(cmd);
+    SimcomResp resp = simcomUart.get_resp(cmd);
+    if (mtw_str::StrContainsSubstr((char *)(cmd.cmd), CARECV, SIZE(CARECV), SIZE(CARECV)) >= 0)
+    {
+        if (!resp.msg.contains(RESP_ERROR))
+        {
+            // +CARECV: <size>,<data>
+            uint16_t index = resp.msg.find(':') + 2;
+            uint16_t comma_pos = resp.msg.find(',');
+            string s = resp.msg.substr(index, comma_pos - index);
+            int size = stoi(s);
+            char *r = new char[size];
+            index = comma_pos + 1;
+            for (int i = 0; i < size; i++)
+            {
+                r[i] = resp.msg[index + i];
+            }
+            cout << "Size: " << size << endl
+                 << "HEX: " << mtw_str::to_hex_string(r, size) << endl;
+            MqttMsgAck ack = MqttMsgAck(r, size);
+            ack.decode();
+        }
+    }
+    return resp;
+}
+
+SimcomResp Simcom::send(Casend casend_cmd)
+{
+    casend_cmd.build();
+    simcomUart.send(casend_cmd);
+    return simcomUart.get_resp(casend_cmd);
+}
+
+SimcomResp Simcom::get_resp(Command cmd)
+{
+    return simcomUart.get_resp(cmd);
+}

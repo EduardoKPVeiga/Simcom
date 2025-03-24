@@ -26,7 +26,7 @@ public:
     string msg;
     uint16_t size_f;
     uint16_t size_m;
-    uint8_t not_used;
+    bool not_used;
 
     /**
      * Constructor

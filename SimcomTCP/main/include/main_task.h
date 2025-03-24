@@ -19,6 +19,7 @@
  */
 typedef enum main_task_message
 {
+    START_NETWORK,
     START_MQTT,
     SEND_MSG,
     RESTART_DEVICE,
@@ -39,8 +40,10 @@ void main_task_init(void);
 
 void main_task(void *pvParameters);
 
-SimcomCmdQueue create_start_mqtt_queue();
+bool start_network(Simcom *simcom);
 
-SimcomCmdQueue create_send_msg_queue();
+bool start_mqtt(Simcom *simcom);
+
+bool send_msg(Simcom *simcom);
 
 #endif // MAIN_TASK_H

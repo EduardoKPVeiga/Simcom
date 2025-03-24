@@ -4,7 +4,7 @@ SimcomResp::SimcomResp() : from(""),
                            msg(""),
                            size_f(0),
                            size_m(0),
-                           not_used(0) {}
+                           not_used(true) {}
 
 SimcomResp::SimcomResp(list<string> data) : SimcomResp()
 {
@@ -29,6 +29,7 @@ SimcomResp::SimcomResp(list<string> data) : SimcomResp()
         }
         data.pop_front();
     }
+    this->not_used = false;
 }
 
 SimcomResp::~SimcomResp() {}
@@ -73,5 +74,5 @@ void SimcomResp::extract_from(string data, size_t size)
 
 bool SimcomResp::valid(Command cmd)
 {
-    return msg.contains(RESP_OK);
+    return !msg.contains(RESP_ERROR);
 }

@@ -69,11 +69,13 @@ bool pwrkey_power_on()
         if (c >= SIMCOM_PWR_ON_ATTEMPTS)
             return false;
     }
+    set_pin(PIN_SIMCOM_STATUS, GPIO_MODE_INPUT, GPIO_INTR_DISABLE, NULL, NULL);
     return true;
 }
 
 bool pwrkey_power_off()
 {
+    set_pin(PIN_SIMCOM_STATUS, GPIO_MODE_INPUT, GPIO_INTR_POSEDGE, simcom_status_isr_handler, NULL);
     if (simcom_get_pwr_mode() == true)
     {
         vTaskDelay(PWRKEY_T_OFF);

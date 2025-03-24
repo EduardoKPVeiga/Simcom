@@ -33,7 +33,7 @@ void main_task(void *pvParameters)
     pins_init();
     Simcom simcom = Simcom(sn);
     simcom.power(true);
-
+    vTaskDelay(5000 / portTICK_PERIOD_MS);
     main_task_send_message(START_MQTT);
 
     for (;;)
@@ -43,12 +43,24 @@ void main_task(void *pvParameters)
             switch (msg.msgID)
             {
 
+            case START_NETWORK:
+                ESP_LOGI(TAG, "START_NETWORK");
+                if (!start_network(&simcom))
+                {
+                    ESP_LOGE(TAG, "Start network failed.");
+                    vTaskDelay(1000 / portTICK_PERIOD_MS);
+                    main_task_send_message(START_NETWORK);
+                }
+                else
+                    main_task_send_message(START_MQTT);
+                break;
+
             case START_MQTT:
                 ESP_LOGI(TAG, "START_MQTT");
-                simcom.set_queue(create_start_mqtt_queue());
-                if (!simcom.send())
+                if (!start_mqtt(&simcom))
                 {
-                    ESP_LOGE(TAG, "Error sending message.");
+                    ESP_LOGE(TAG, "Start MQTT failed.");
+                    vTaskDelay(1000 / portTICK_PERIOD_MS);
                     main_task_send_message(START_MQTT);
                 }
                 else
@@ -57,14 +69,18 @@ void main_task(void *pvParameters)
 
             case SEND_MSG:
                 ESP_LOGI(TAG, "SEND_MSG");
-                simcom.set_queue(create_send_msg_queue());
-                simcom.send();
-                vTaskDelay(5000 / portTICK_PERIOD_MS);
-                main_task_send_message(SEND_MSG);
+                if (send_msg(&simcom))
+                {
+                    vTaskDelay(5000 / portTICK_PERIOD_MS);
+                    main_task_send_message(SEND_MSG);
+                }
+                else
+                    main_task_send_message(RESTART_DEVICE);
                 break;
 
             case RESTART_DEVICE:
                 simcom.power(false);
+                vTaskDelay(1000 / portTICK_PERIOD_MS);
                 esp_restart();
                 break;
 
@@ -73,7 +89,7 @@ void main_task(void *pvParameters)
                 simcom.power(true);
                 xQueueReset(main_task_queue_handle);
                 vTaskDelay(5000 / portTICK_PERIOD_MS);
-                main_task_send_message(START_MQTT);
+                main_task_send_message(START_NETWORK);
                 break;
 
             default:
@@ -82,45 +98,56 @@ void main_task(void *pvParameters)
         }
     }
 }
-
-SimcomCmdQueue create_start_mqtt_queue()
+bool start_network(Simcom *simcom)
 {
-    SimcomCmdQueue queue = SimcomCmdQueue(cmd_queue_type_e::PDN_AUTO_ACT);
-
-    Command cmd = Command(CPIN, CMD_action_enum::READ);
-    queue.enqueue(cmd);
+    SimcomResp resp = SimcomResp();
+    Command cmd = Command();
 
     cmd = Command(CSQ, CMD_action_enum::EXE);
-    queue.enqueue(cmd);
-
-    cmd = Command(CGATT, CMD_action_enum::READ);
-    queue.enqueue(cmd);
-
-    cmd = Command(COPS, CMD_action_enum::READ);
-    queue.enqueue(cmd);
+    resp = (*simcom).send(cmd);
+    if (!resp.valid(cmd))
+        return false;
 
     cmd = Command(CGNAPN, CMD_action_enum::EXE);
-    queue.enqueue(cmd);
+    resp = (*simcom).send(cmd);
+    if (!resp.valid(cmd))
+        return false;
 
     cmd = Command(CNCFG, CMD_action_enum::WRITE);
     cmd.add_value(Value((int)0));
     cmd.add_value(Value((int)1));
     cmd.add_value(Value("ctnb"));
-    queue.enqueue(cmd);
+    resp = (*simcom).send(cmd);
+    if (!resp.valid(cmd))
+        return false;
 
     cmd = Command(CNACT, CMD_action_enum::WRITE);
     cmd.add_value(Value((int)0));
     cmd.add_value(Value((int)1));
-    queue.enqueue(cmd);
+    resp = (*simcom).send(cmd);
+    if (!resp.valid(cmd))
+    {
+        cmd = Command(CNACT, CMD_action_enum::READ);
+        resp = (*simcom).send(cmd);
+        int index = resp.msg.find(':') + 5;
+        if (resp.msg[index] == 0)
+            return false;
+    }
 
-    cmd = Command(CNACT, CMD_action_enum::READ);
-    queue.enqueue(cmd);
+    vTaskDelay(2000 / portTICK_PERIOD_MS);
+    resp = (*simcom).get_resp(Command("+APP PDP", CMD_action_enum::EXE));
+    if (resp.msg.contains("DEACTIVE"))
+    {
+        ESP_LOGE(TAG, "Network not activated.");
+        return false;
+    }
+    return true;
+}
 
-    cmd = Command(CASSLCFG, CMD_action_enum::WRITE);
-    cmd.add_value(Value((int)0));
-    cmd.add_value(Value("SSL"));
-    cmd.add_value(Value((int)0));
-    queue.enqueue(cmd);
+bool start_mqtt(Simcom *simcom)
+{
+    SimcomResp resp = SimcomResp();
+    Command cmd = Command();
 
     cmd = Command(CAOPEN, CMD_action_enum::WRITE);
     cmd.add_value(Value((int)0));
@@ -128,10 +155,9 @@ SimcomCmdQueue create_start_mqtt_queue()
     cmd.add_value(Value("TCP"));
     cmd.add_value(Value("172.104.199.107"));
     cmd.add_value(Value((int)1883));
-    queue.enqueue(cmd);
-
-    cmd = Command(CASTATE, CMD_action_enum::READ);
-    queue.enqueue(cmd);
+    resp = (*simcom).send(cmd);
+    if (!resp.valid(cmd))
+        return false;
 
     MqttPacket packet = MqttPacket("S1mC0M5/1", "teste");
     packet.create_connect_packet("S1mC0M5");
@@ -139,42 +165,63 @@ SimcomCmdQueue create_start_mqtt_queue()
     cmd = (Command)casend_cmd;
     casend_cmd.add_value(Value((int)0));
     casend_cmd.add_value(Value((int)packet.buffer_size));
-    queue.enqueue(cmd);
-    queue.enqueue_casend(casend_cmd);
+    resp = (*simcom).send(casend_cmd);
+    if (!resp.valid(cmd))
+        return false;
 
-    cmd = Command(CARECV, CMD_action_enum::WRITE);
-    cmd.add_value(Value((int)0));
-    cmd.add_value(Value((int)4));
-    queue.enqueue(cmd);
+    vTaskDelay(5000 / portTICK_PERIOD_MS);
+    resp = (*simcom).get_resp(Command(CADATAIND, CMD_action_enum::EXE));
+    if (resp.not_used)
+    {
+        ESP_LOGE(TAG, "CADATAIND not triggered.");
+        return false;
+    }
+    else
+    {
+        cmd = Command(CARECV, CMD_action_enum::WRITE);
+        cmd.add_value(Value((int)0));
+        cmd.add_value(Value((int)4));
+        resp = (*simcom).send(cmd);
+        if (!resp.valid(cmd))
+            return false;
+    }
 
     packet.create_subscribe_packet(1564);
     casend_cmd = Casend(CASEND, CMD_action_enum::WRITE, packet.buffer, packet.buffer_size);
     cmd = (Command)casend_cmd;
     casend_cmd.add_value(Value((int)0));
     casend_cmd.add_value(Value((int)packet.buffer_size));
-    queue.enqueue(cmd);
-    queue.enqueue_casend(casend_cmd);
+    resp = (*simcom).send(casend_cmd);
+    if (!resp.valid(cmd))
+        return false;
 
-    cmd = Command(CARECV, CMD_action_enum::WRITE);
-    cmd.add_value(Value((int)0));
-    cmd.add_value(Value((int)5));
-    queue.enqueue(cmd);
+    vTaskDelay(5000 / portTICK_PERIOD_MS);
+    resp = (*simcom).get_resp(Command(CADATAIND, CMD_action_enum::EXE));
+    if (resp.not_used)
+    {
+        ESP_LOGE(TAG, "CADATAIND not triggered.");
+        return false;
+    }
+    else
+    {
+        cmd = Command(CARECV, CMD_action_enum::WRITE);
+        cmd.add_value(Value((int)0));
+        cmd.add_value(Value((int)5));
+        resp = (*simcom).send(cmd);
+        if (!resp.valid(cmd))
+            return false;
+    }
 
-    return queue;
+    return true;
 }
 
-SimcomCmdQueue create_send_msg_queue()
+bool send_msg(Simcom *simcom)
 {
-    SimcomCmdQueue queue = SimcomCmdQueue(cmd_queue_type_e::EMPTY);
-
     MqttPacket packet = MqttPacket("S1mC0M5/1", "teste");
     packet.create_publish_packet();
     Casend casend_cmd = Casend(CASEND, CMD_action_enum::WRITE, packet.buffer, packet.buffer_size);
-    Command cmd = (Command)casend_cmd;
     casend_cmd.add_value(Value((int)0));
     casend_cmd.add_value(Value((int)packet.buffer_size));
-    queue.enqueue(cmd);
-    queue.enqueue_casend(casend_cmd);
-
-    return queue;
+    SimcomResp resp = (*simcom).send(casend_cmd);
+    return resp.valid(casend_cmd);
 }
