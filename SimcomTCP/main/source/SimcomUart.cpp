@@ -47,10 +47,24 @@ void SimcomUart::close()
     set_pin(PIN_SIMCOM_TX, GPIO_MODE_INPUT, GPIO_INTR_DISABLE, NULL, NULL);
 }
 
+void SimcomUart::send(Command cmd)
+{
+    uart_write_bytes(uart_num, cmd.msg_send, cmd.size);
+    uart_wait_tx_done(uart_num, 100);
+    vTaskDelay(DEFAULT_CMD_SEND_DELAY);
+}
+
+void SimcomUart::send(Casend casend)
+{
+    send((Command)casend);
+    send(casend.data, casend.data_size);
+}
+
 void SimcomUart::send(const char *data, size_t size)
 {
     uart_write_bytes(uart_num, data, size);
     uart_wait_tx_done(uart_num, 100);
+    vTaskDelay(DEFAULT_CASEND_CMD_SEND_DELAY);
 }
 
 void SimcomUart::simcom_uart_task(void *pvParameters)

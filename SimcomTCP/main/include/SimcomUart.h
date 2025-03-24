@@ -12,6 +12,7 @@
 #include "mtw_str.h"
 #include "SimcomRespList.h"
 #include "Command.h"
+#include "Casend.h"
 
 using namespace std;
 
@@ -21,6 +22,9 @@ using namespace std;
 #define SIMCOM_UART_TASK_STACK_SIZE 16 * 1024
 #define SIMCOM_UART_TASK_PRIORITY configMAX_PRIORITIES - 1
 #define SIMCOM_UART_TASK_CORE_ID 0
+
+#define DEFAULT_CMD_SEND_DELAY 1000 / portTICK_PERIOD_MS
+#define DEFAULT_CASEND_CMD_SEND_DELAY 1000 / portTICK_PERIOD_MS
 
 class SimcomUart
 {
@@ -41,6 +45,8 @@ public:
 
     static void open();
     static void close();
+    static void send(Command cmd);
+    static void send(Casend cmd);
     static void send(const char *data, size_t size);
     static SimcomResp get_resp(Command cmd);
 };

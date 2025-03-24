@@ -36,8 +36,6 @@ bool Simcom::send()
     Command cmd = Command();
     Casend casend_cmd = Casend();
     MqttMsgAck ack = MqttMsgAck();
-    uint16_t size = 0;
-    char msg_send[MAX_NUM_CHAR_SEND_BUFF] = {0};
 
     while (!cmd_queue.is_empty())
     {
@@ -46,16 +44,12 @@ bool Simcom::send()
         {
             casend_cmd = cmd_queue.dequeue_casend();
             casend_cmd.build();
-            simcomUart.send(casend_cmd.msg_send, casend_cmd.size);
-            vTaskDelay(1000 / portTICK_PERIOD_MS);
-            simcomUart.send(casend_cmd.data, casend_cmd.data_size);
-            vTaskDelay(1000 / portTICK_PERIOD_MS);
+            simcomUart.send(casend_cmd);
         }
         else
         {
             cmd.build();
-            simcomUart.send(cmd.msg_send, cmd.size);
-            vTaskDelay(1000 / portTICK_PERIOD_MS);
+            simcomUart.send(cmd);
             SimcomResp resp = simcomUart.get_resp(cmd);
 
             if (mtw_str::StrContainsSubstr((char *)(cmd.cmd), CARECV, SIZE(CARECV), SIZE(CARECV)) >= 0)
