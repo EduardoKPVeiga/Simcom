@@ -60,6 +60,9 @@ void main_task(void *pvParameters)
                 if (!start_mqtt(&simcom))
                 {
                     ESP_LOGE(TAG, "Start MQTT failed.");
+                    Command cmd = Command(CACLOSE, CMD_action_enum::WRITE);
+                    cmd.add_value(Value((int)0));
+                    simcom.send(cmd);
                     vTaskDelay(1000 / portTICK_PERIOD_MS);
                     main_task_send_message(START_MQTT);
                 }
@@ -155,10 +158,12 @@ bool start_mqtt(Simcom *simcom)
     cmd.add_value(Value("TCP"));
     cmd.add_value(Value("172.104.199.107"));
     cmd.add_value(Value((int)1883));
+    cmd.add_value(Value((int)1));
     resp = (*simcom).send(cmd);
     if (!resp.valid(cmd))
         return false;
 
+    vTaskDelay(1000 / portTICK_PERIOD_MS);
     MqttPacket packet = MqttPacket("S1mC0M5/1", "teste");
     packet.create_connect_packet("S1mC0M5");
     Casend casend_cmd = Casend(CASEND, CMD_action_enum::WRITE, packet.buffer, packet.buffer_size);
@@ -169,23 +174,7 @@ bool start_mqtt(Simcom *simcom)
     if (!resp.valid(cmd))
         return false;
 
-    vTaskDelay(5000 / portTICK_PERIOD_MS);
-    resp = (*simcom).get_resp(Command(CADATAIND, CMD_action_enum::EXE));
-    if (resp.not_used)
-    {
-        ESP_LOGE(TAG, "CADATAIND not triggered.");
-        return false;
-    }
-    else
-    {
-        cmd = Command(CARECV, CMD_action_enum::WRITE);
-        cmd.add_value(Value((int)0));
-        cmd.add_value(Value((int)4));
-        resp = (*simcom).send(cmd);
-        if (!resp.valid(cmd))
-            return false;
-    }
-
+    packet = MqttPacket("S1mC0M5/2", "teste");
     packet.create_subscribe_packet(1564);
     casend_cmd = Casend(CASEND, CMD_action_enum::WRITE, packet.buffer, packet.buffer_size);
     cmd = (Command)casend_cmd;
@@ -194,23 +183,6 @@ bool start_mqtt(Simcom *simcom)
     resp = (*simcom).send(casend_cmd);
     if (!resp.valid(cmd))
         return false;
-
-    vTaskDelay(5000 / portTICK_PERIOD_MS);
-    resp = (*simcom).get_resp(Command(CADATAIND, CMD_action_enum::EXE));
-    if (resp.not_used)
-    {
-        ESP_LOGE(TAG, "CADATAIND not triggered.");
-        return false;
-    }
-    else
-    {
-        cmd = Command(CARECV, CMD_action_enum::WRITE);
-        cmd.add_value(Value((int)0));
-        cmd.add_value(Value((int)5));
-        resp = (*simcom).send(cmd);
-        if (!resp.valid(cmd))
-            return false;
-    }
 
     return true;
 }

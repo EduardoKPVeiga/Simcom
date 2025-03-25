@@ -13,6 +13,7 @@
 #include "SimcomRespList.h"
 #include "Command.h"
 #include "Casend.h"
+#include "Caurc.h"
 
 using namespace std;
 
@@ -39,6 +40,7 @@ public:
     static volatile bool received;
     static uart_port_t uart_num;
     static SimcomRespList simcom_resp_list;
+    static queue<Caurc> server_msg_queue;
 
     SimcomUart();
     ~SimcomUart();

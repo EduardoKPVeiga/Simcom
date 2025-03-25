@@ -40,6 +40,7 @@
 #define GNSS_LOCATION_VARIABLES 3
 
 #define MAX_NUM_CHAR_SEND_BUFF 559
+#define MAX_NUM_CHAR_RECEIVE_BUFF 559
 // ================================================
 
 // gsm_commands ===========================================================================
@@ -385,6 +386,7 @@ enum Network_select_enum
 #define CAACK "+CAACK"         // Query send data information
 #define CARECV "+CARECV"       // Receive Data via an Established Connection
 #define CADATAIND "+CADATAIND" // Data indication
+#define CAURC "+CAURC"
 
 #define KEEPALIVE "KEEPALIVE"
 // ========================================================================================

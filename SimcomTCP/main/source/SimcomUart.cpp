@@ -9,6 +9,7 @@ TaskHandle_t SimcomUart::uartGsmTaskHandle = NULL;
 volatile bool SimcomUart::received = false;
 uart_port_t SimcomUart::uart_num = UART_NUM_2;
 SimcomRespList SimcomUart::simcom_resp_list = SimcomRespList();
+queue<Caurc> server_msg_queue = queue<Caurc>();
 
 SimcomUart::SimcomUart()
 {
@@ -75,6 +76,7 @@ void SimcomUart::simcom_uart_task(void *pvParameters)
     string msg = "";
     int index = 0;
     bool waiting = false;
+    Caurc server_msg = Caurc();
 
     for (;;)
     {
@@ -85,6 +87,16 @@ void SimcomUart::simcom_uart_task(void *pvParameters)
             case UART_DATA:
                 uart_read_bytes(uart_num, raw_msg_received, event.size, portMAX_DELAY);
                 index = mtw_str::StrContainsChar(raw_msg_received, '\0', event.size);
+
+                if (mtw_str::StrContainsSubstr(raw_msg_received, CAURC, event.size, SIZE(CAURC)) >= 0)
+                {
+                    server_msg = Caurc(raw_msg_received, event.size);
+                    // server_msg_queue.push(server_msg);
+                    cout << mtw_str::to_hex_string(server_msg.data, server_msg.length) << endl
+                         << server_msg.data << endl;
+                    break;
+                }
+
                 if (index >= 0)
                 {
                     msg = string(raw_msg_received, index);
