@@ -31,59 +31,6 @@ void Simcom::set_queue(SimcomCmdQueue queue)
     simcomUart.simcom_resp_list.clear();
 }
 
-bool Simcom::send()
-{
-    Command cmd = Command();
-    Casend casend_cmd = Casend();
-    MqttMsgAck ack = MqttMsgAck();
-
-    while (!cmd_queue.is_empty())
-    {
-        cmd = cmd_queue.dequeue();
-        if (mtw_str::StrContainsSubstr((char *)(cmd.cmd), CASEND, SIZE(CASEND), SIZE(CASEND)) >= 0)
-        {
-            casend_cmd = cmd_queue.dequeue_casend();
-            casend_cmd.build();
-            simcomUart.send(casend_cmd);
-        }
-        else
-        {
-            cmd.build();
-            simcomUart.send(cmd);
-            SimcomResp resp = simcomUart.get_resp(cmd);
-
-            if (mtw_str::StrContainsSubstr((char *)(cmd.cmd), CARECV, SIZE(CARECV), SIZE(CARECV)) >= 0)
-            {
-                if (!resp.msg.contains(RESP_ERROR))
-                {
-                    // +CARECV: <size>,<data>
-                    uint16_t index = resp.msg.find(':') + 2;
-                    uint16_t comma_pos = resp.msg.find(',');
-                    string s = resp.msg.substr(index, comma_pos - index);
-                    int size = stoi(s);
-                    char *r = new char[size];
-                    index = comma_pos + 1;
-                    for (int i = 0; i < size; i++)
-                    {
-                        r[i] = resp.msg[index + i];
-                    }
-                    cout << "Size: " << size << endl
-                         << "HEX: " << mtw_str::to_hex_string(r, size) << endl;
-                    ack = MqttMsgAck(r, size);
-                    ack.decode();
-                }
-            }
-
-            // Validar resposta
-            if (!resp.valid(cmd))
-            {
-                return false;
-            }
-        }
-    }
-    return true;
-}
-
 SimcomResp Simcom::send(Command cmd)
 {
     cmd.build();
@@ -106,8 +53,8 @@ SimcomResp Simcom::send(Command cmd)
             }
             cout << "Size: " << size << endl
                  << "HEX: " << mtw_str::to_hex_string(r, size) << endl;
-            MqttMsgAck ack = MqttMsgAck(r, size);
-            ack.decode();
+            // MqttMsgAck ack = MqttMsgAck(r, size);
+            // ack.decode();
         }
     }
     return resp;

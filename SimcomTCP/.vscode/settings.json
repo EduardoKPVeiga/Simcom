@@ -93,7 +93,8 @@
         "typeinfo": "cpp",
         "simcomresplist.h": "c",
         "simcomcmdqueue.h": "c",
-        "mqttpacket.h": "c"
+        "mqttpacket.h": "c",
+        "mqttpacketfixedheader.h": "c"
     },
     "idf.flashType": "UART"
 }

@@ -1,11 +1,5 @@
-#ifndef MQTTMSGACK_H
-#define MQTTMSGACK_H
-
-#include "mtw_str.h"
-#include <stdint.h>
-#include "freertos/FreeRTOS.h"
-#include "esp_log.h"
-#include "esp_mac.h"
+#ifndef MQTTDEFINITIONS_H
+#define MQTTDEFINITIONS_H
 
 enum msg_type_e
 {
@@ -45,23 +39,11 @@ enum connect_return_code_e
     RESERVED_CONNECT_RETURN_CODE = 6
 };
 
-class MqttMsgAck
-{
-private:
-    msg_type_e type;
-    uint8_t dup_flag;
-    qos_e qos;
-    uint8_t retain;
-    uint16_t remaining_length;
-    connect_return_code_e connack_code;
-    uint16_t packet_id;
+#define MAX_LENGTH_PUB_VAR_HEADER 256
+#define MAX_SIZE_PUB_MSG 512
 
-public:
-    MqttMsgAck();
-    MqttMsgAck(char *data, uint16_t size);
-    ~MqttMsgAck();
+#define MAX_SUB_PAYLOAD_SIZE 256
 
-    void decode();
-};
+#define MQTT_VAR_HEADER_SIZE 12
 
-#endif // MQTTMSGACK_H
+#endif // MQTTDEFINITIONS_H

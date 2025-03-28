@@ -26,10 +26,7 @@ Caurc::Caurc(char *msg, uint16_t size) : Caurc()
 
     uint16_t data_begin = index_end + 1;
     this->length = size - data_begin; // <CR><LF><data>
-    for (int i = 0; i < this->length; i++)
-    {
-        this->data[i] = msg[data_begin + i];
-    }
+    memcpy(&(msg[data_begin]), this->data, this->length);
 }
 
 Caurc::~Caurc()

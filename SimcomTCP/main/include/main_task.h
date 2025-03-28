@@ -8,6 +8,9 @@
 #include "Simcom.h"
 #include "mtw_str.h"
 #include "MqttPacket.h"
+#include "MqttCon.h"
+#include "MqttPub.h"
+#include "MqttSub.h"
 
 // Main application task
 #define MAIN_TASK_STACK_SIZE 10 * 1024

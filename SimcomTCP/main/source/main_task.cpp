@@ -164,22 +164,23 @@ bool start_mqtt(Simcom *simcom)
         return false;
 
     vTaskDelay(1000 / portTICK_PERIOD_MS);
-    MqttPacket packet = MqttPacket("S1mC0M5/1", "teste");
-    packet.create_connect_packet("S1mC0M5");
-    Casend casend_cmd = Casend(CASEND, CMD_action_enum::WRITE, packet.buffer, packet.buffer_size);
+    MqttCon con_packet = MqttCon("S1mC0M5");
+    con_packet.build();
+    Casend casend_cmd = Casend(CASEND, CMD_action_enum::WRITE, (char *)con_packet.buffer(), con_packet.buffer_size());
     cmd = (Command)casend_cmd;
     casend_cmd.add_value(Value((int)0));
-    casend_cmd.add_value(Value((int)packet.buffer_size));
+    casend_cmd.add_value(Value((int)con_packet.buffer_size()));
     resp = (*simcom).send(casend_cmd);
     if (!resp.valid(cmd))
         return false;
 
-    packet = MqttPacket("S1mC0M5/2", "teste");
-    packet.create_subscribe_packet(1564);
-    casend_cmd = Casend(CASEND, CMD_action_enum::WRITE, packet.buffer, packet.buffer_size);
+    MqttSub sub_packet = MqttSub(1564);
+    sub_packet.add_topic("S1mC0M5/2", qos_e::AT_MOST_ONCE);
+    sub_packet.build();
+    casend_cmd = Casend(CASEND, CMD_action_enum::WRITE, (char *)sub_packet.buffer(), sub_packet.buffer_size());
     cmd = (Command)casend_cmd;
     casend_cmd.add_value(Value((int)0));
-    casend_cmd.add_value(Value((int)packet.buffer_size));
+    casend_cmd.add_value(Value((int)sub_packet.buffer_size()));
     resp = (*simcom).send(casend_cmd);
     if (!resp.valid(cmd))
         return false;
@@ -189,11 +190,13 @@ bool start_mqtt(Simcom *simcom)
 
 bool send_msg(Simcom *simcom)
 {
-    MqttPacket packet = MqttPacket("S1mC0M5/1", "teste");
-    packet.create_publish_packet();
-    Casend casend_cmd = Casend(CASEND, CMD_action_enum::WRITE, packet.buffer, packet.buffer_size);
+    uint8_t data[5] = {'H', 'E', 'L', 'L', 'O'};
+    MqttPub pub_packet = MqttPub(1564);
+    pub_packet.set("S1mC0M5/1", data, 5);
+    pub_packet.build();
+    Casend casend_cmd = Casend(CASEND, CMD_action_enum::WRITE, (char *)pub_packet.buffer(), pub_packet.buffer_size());
     casend_cmd.add_value(Value((int)0));
-    casend_cmd.add_value(Value((int)packet.buffer_size));
+    casend_cmd.add_value(Value((int)pub_packet.buffer_size()));
     SimcomResp resp = (*simcom).send(casend_cmd);
     return resp.valid(casend_cmd);
 }

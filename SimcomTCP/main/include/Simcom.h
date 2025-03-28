@@ -4,7 +4,6 @@
 #include "SimcomUart.h"
 #include "SimcomCmdQueue.h"
 #include "simcom_definitions.h"
-#include "MqttMsgAck.h"
 
 #define SN_SIZE 7
 
@@ -22,7 +21,6 @@ public:
 
     bool power(bool pwr);
     void set_queue(SimcomCmdQueue queue);
-    bool send();
     SimcomResp send(Command cmd);
     SimcomResp send(Casend cmd);
     SimcomResp get_resp(Command cmd);
