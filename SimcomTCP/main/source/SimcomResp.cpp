@@ -74,5 +74,8 @@ void SimcomResp::extract_from(string data, size_t size)
 
 bool SimcomResp::valid(Command cmd)
 {
-    return !msg.contains(RESP_ERROR);
+    if (!msg.contains(RESP_ERROR) && from.contains(cmd.cmd))
+        return true;
+    cout << cmd.cmd << endl;
+    return false;
 }

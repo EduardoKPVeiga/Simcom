@@ -1,6 +1,6 @@
 #include "MqttCon.h"
 
-MqttCon::MqttCon() : MqttPacket(msg_type_e::CONNECT, 0, qos_e::AT_MOST_ONCE, 0, 12),
+MqttCon::MqttCon() : MqttPacket(msg_type_e::CONNECT, 0, qos_e::AT_MOST_ONCE, 0, 19),
                      var_header(MqttConVarHeader()),
                      client_id("SNTESTE"),
                      will_topic(""),
@@ -49,4 +49,6 @@ void MqttCon::build()
     this->data[this->data_size++] = client_id_length & 0x00FF;
     const char id[client_id_length] = {0};
     memcpy(&(this->data[this->data_size]), (this->client_id).c_str(), client_id_length);
+    this->data_size += client_id_length;
+    cout << mtw_str::to_hex_string((char *)this->data, this->data_size) << endl;
 }

@@ -18,6 +18,7 @@ public:
     ~MqttSubPayload();
 
     void add(string t, qos_e q);
+    void build();
 };
 
 #endif // MQTTSUBPAYLOAD_H

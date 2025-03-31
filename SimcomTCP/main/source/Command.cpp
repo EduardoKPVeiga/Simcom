@@ -61,34 +61,24 @@ void Command::build()
 {
     // Add begin command
     size = 0;
-    for (int i = 0; i < SIZE(BEGIN_CMD); i++)
-    {
-        msg_send[i] = BEGIN_CMD[i];
-        size++;
-    }
+    memcpy(this->msg_send, BEGIN_CMD, SIZE(BEGIN_CMD));
+    this->size += SIZE(BEGIN_CMD);
 
     // Add command
-    for (int i = 0; i < strlen(cmd); i++)
-    {
-        msg_send[size] = cmd[i];
-        size++;
-    }
+    memcpy(&(this->msg_send[this->size]), this->cmd, strlen(this->cmd));
+    this->size += strlen(this->cmd);
     if (this->action == WRITE)
     {
-        msg_send[size] = WRITE_CMD[0];
-        size++;
+        this->msg_send[this->size++] = WRITE_CMD[0];
     }
     else if (action == READ)
     {
-        msg_send[size] = READ_CMD[0];
-        size++;
+        this->msg_send[this->size++] = READ_CMD[0];
     }
     else if (action == TEST)
     {
-        msg_send[size] = TEST_CMD[0];
-        size++;
-        msg_send[size] = TEST_CMD[1];
-        size++;
+        this->msg_send[this->size++] = TEST_CMD[0];
+        this->msg_send[this->size++] = TEST_CMD[1];
     }
 
     // Add values
@@ -100,42 +90,30 @@ void Command::build()
             const char *str = it->get_value_string().c_str();
 
             // Add quotation marks
-            msg_send[size] = '"';
-            size++;
-            for (int i = 0; i < strlen(str); i++)
-            {
-                msg_send[size] = str[i];
-                size++;
-            }
+            this->msg_send[this->size++] = '"';
+            memcpy(&(this->msg_send[this->size]), str, strlen(str));
+            this->size += strlen(str);
 
             // Add quotation marks
-            msg_send[size] = '"';
-            size++;
+            this->msg_send[this->size++] = '"';
         }
         else if (it->get_type() == value_type_e::NUMBER)
         {
             // Add number
             int num = it->get_value_int();
             const char *a = mtw_str::decimal_to_char_array(num);
-            for (int i = 0; i < strlen(a); i++)
-            {
-                msg_send[size] = a[i];
-                size++;
-            }
+
+            memcpy(&(this->msg_send[this->size]), a, strlen(a));
+            this->size += strlen(a);
         }
-        msg_send[size] = VALUE_DELIMITER[0];
-        size++;
+        this->msg_send[this->size++] = VALUE_DELIMITER[0];
     }
     if (this->action == WRITE)
         size--;
 
     // Add end command
-    int aux = size;
-    for (int i = 0; i < SIZE(END_CMD); i++)
-    {
-        msg_send[i + aux] = END_CMD[i];
-        size++;
-    }
+    memcpy(&(this->msg_send[this->size]), END_CMD, SIZE(END_CMD));
+    this->size += SIZE(END_CMD);
 }
 
 void Command::add_value(Value value)

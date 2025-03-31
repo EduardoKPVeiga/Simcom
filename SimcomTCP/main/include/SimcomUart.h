@@ -18,7 +18,7 @@
 using namespace std;
 
 #define BAUD_RATE 38400
-#define MSG_RECEIVED_BUFF_SIZE 4 * 1024
+#define MSG_RECEIVED_BUFF_SIZE 1 * 1024
 
 #define SIMCOM_UART_TASK_STACK_SIZE 16 * 1024
 #define SIMCOM_UART_TASK_PRIORITY configMAX_PRIORITIES - 1
@@ -51,6 +51,7 @@ public:
     static void send(Casend cmd);
     static void send(const char *data, size_t size);
     static SimcomResp get_resp(Command cmd);
+    static void clear();
 };
 
 #endif // SIMCOMUART_H

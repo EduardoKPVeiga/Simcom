@@ -31,10 +31,11 @@ void Simcom::set_queue(SimcomCmdQueue queue)
     simcomUart.simcom_resp_list.clear();
 }
 
-SimcomResp Simcom::send(Command cmd)
+SimcomResp Simcom::send(Command cmd, uint16_t d)
 {
     cmd.build();
     simcomUart.send(cmd);
+    vTaskDelay(d / portTICK_PERIOD_MS);
     SimcomResp resp = simcomUart.get_resp(cmd);
     if (mtw_str::StrContainsSubstr((char *)(cmd.cmd), CARECV, SIZE(CARECV), SIZE(CARECV)) >= 0)
     {
@@ -60,10 +61,11 @@ SimcomResp Simcom::send(Command cmd)
     return resp;
 }
 
-SimcomResp Simcom::send(Casend casend_cmd)
+SimcomResp Simcom::send(Casend casend_cmd, uint16_t d)
 {
     casend_cmd.build();
     simcomUart.send(casend_cmd);
+    vTaskDelay(d / portTICK_PERIOD_MS);
     return simcomUart.get_resp(casend_cmd);
 }
 

@@ -160,3 +160,8 @@ SimcomResp SimcomUart::get_resp(Command cmd)
     }
     return resp;
 }
+
+void SimcomUart::clear()
+{
+    simcom_resp_list.clear();
+}

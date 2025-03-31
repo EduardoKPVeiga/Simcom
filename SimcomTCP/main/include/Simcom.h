@@ -21,8 +21,8 @@ public:
 
     bool power(bool pwr);
     void set_queue(SimcomCmdQueue queue);
-    SimcomResp send(Command cmd);
-    SimcomResp send(Casend cmd);
+    SimcomResp send(Command cmd, uint16_t d = 10);
+    SimcomResp send(Casend cmd, uint16_t d = 10);
     SimcomResp get_resp(Command cmd);
 };
 

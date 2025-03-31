@@ -13,7 +13,7 @@
 #include "MqttSub.h"
 
 // Main application task
-#define MAIN_TASK_STACK_SIZE 10 * 1024
+#define MAIN_TASK_STACK_SIZE 16 * 1024
 #define MAIN_TASK_PRIORITY configMAX_PRIORITIES - 2
 #define MAIN_TASK_CORE_ID 0
 
@@ -23,7 +23,9 @@
 typedef enum main_task_message
 {
     START_NETWORK,
+    START_NETWORK_ERROR,
     START_MQTT,
+    START_MQTT_ERROR,
     SEND_MSG,
     RESTART_DEVICE,
     SIMCOM_PRW_ON
@@ -48,5 +50,7 @@ bool start_network(Simcom *simcom);
 bool start_mqtt(Simcom *simcom);
 
 bool send_msg(Simcom *simcom);
+
+void start_mqtt_error_routine(Simcom *simcom);
 
 #endif // MAIN_TASK_H
