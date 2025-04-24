@@ -19,15 +19,14 @@ public:
     char payload[MAX_NUM_CHAR_SEND_BUFF];
 
     MqttPacket();
-    MqttPacket(const char *t, const char *p);
+    MqttPacket(string t);
+    MqttPacket(string t, string p);
     ~MqttPacket();
 
     void set_topic(char *t);
     void set_payload(char *p);
 
-    int create_publish_packet();
-    int create_subscribe_packet(uint16_t id);
-    int create_connect_packet(char *client_id);
+    virtual void create_packet() = 0;
 };
 
 #endif // MQTTPACKET_H

@@ -7,7 +7,9 @@
 #include "esp_log.h"
 #include "Simcom.h"
 #include "mtw_str.h"
-#include "MqttPacket.h"
+#include "MqttConPacket.h"
+#include "MqttPubPacket.h"
+#include "MqttSubPacket.h"
 
 // Main application task
 #define MAIN_TASK_STACK_SIZE 10 * 1024
