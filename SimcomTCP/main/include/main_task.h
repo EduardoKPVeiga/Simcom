@@ -12,7 +12,7 @@
 #include "MqttSubPacket.h"
 
 // Main application task
-#define MAIN_TASK_STACK_SIZE 10 * 1024
+#define MAIN_TASK_STACK_SIZE 16 * 1024
 #define MAIN_TASK_PRIORITY configMAX_PRIORITIES - 2
 #define MAIN_TASK_CORE_ID 0
 
