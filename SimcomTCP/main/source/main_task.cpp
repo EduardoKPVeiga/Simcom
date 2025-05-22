@@ -45,7 +45,7 @@ void main_task(void *pvParameters)
 
             case START_NETWORK:
                 ESP_LOGI(TAG, "START_NETWORK");
-                if (!simcom.start_network())
+                if (!simcom.network_connect())
                 {
                     ESP_LOGE(TAG, "Start network failed.");
                     vTaskDelay(1000 / portTICK_PERIOD_MS);
@@ -60,7 +60,7 @@ void main_task(void *pvParameters)
                 if (!simcom.mqtt_connect("172.104.199.107", 1883))
                 {
                     ESP_LOGE(TAG, "Start MQTT failed.");
-                    simcom.close_connection();
+                    simcom.network_disconnect();
                     vTaskDelay(3000 / portTICK_PERIOD_MS);
                     main_task_send_message(RESTART_DEVICE);
                 }
@@ -70,7 +70,7 @@ void main_task(void *pvParameters)
 
             case SEND_MSG:
                 ESP_LOGI(TAG, "SEND_MSG");
-                if (simcom.mqtt_send_msg("S1mC0M5/2", "teste"))
+                if (simcom.mqtt_publish("S1mC0M5/2", "teste"))
                 {
                     vTaskDelay(5000 / portTICK_PERIOD_MS);
                     main_task_send_message(SEND_MSG);

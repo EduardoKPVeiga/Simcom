@@ -71,7 +71,6 @@ bool Simcom::mqtt_connect(string s_ip, int port)
     resp = this->send(casend_cmd);
     if (!resp.valid(cmd))
         return false;
-    cout << "MQTT CONNECT" << endl;
 
     // MqttSubPacket s_packet = MqttSubPacket("S1mC0M5/2", 1564);
     // s_packet.create_packet();
@@ -86,7 +85,22 @@ bool Simcom::mqtt_connect(string s_ip, int port)
     return true;
 }
 
-bool Simcom::start_network()
+bool Simcom::mqtt_disconnect()
+{
+    SimcomResp resp = SimcomResp();
+    Command cmd = Command();
+    MqttDiscPacket c_packet = MqttDiscPacket();
+    c_packet.create_packet();
+    Casend casend_cmd = Casend(CASEND, CMD_action_enum::WRITE, c_packet.buffer, c_packet.buffer_size);
+    cmd = (Command)casend_cmd;
+    casend_cmd.add_value(Value((int)0));
+    casend_cmd.add_value(Value((int)c_packet.buffer_size));
+    resp = this->send(casend_cmd);
+    if (!resp.valid(cmd))
+        return false;
+}
+
+bool Simcom::network_connect()
 {
     SimcomResp resp = SimcomResp();
     Command cmd = Command();
@@ -132,7 +146,7 @@ bool Simcom::start_network()
     return true;
 }
 
-bool Simcom::close_connection()
+bool Simcom::network_disconnect()
 {
     Command cmd = Command(CACLOSE, CMD_action_enum::WRITE);
     cmd.add_value(Value((int)0));
@@ -140,17 +154,24 @@ bool Simcom::close_connection()
     return true;
 }
 
-bool Simcom::mqtt_send_msg(string topic, string msg)
+bool Simcom::mqtt_publish(string topic, string msg)
 {
     MqttPubPacket p_packet = MqttPubPacket(topic, msg);
     p_packet.create_packet();
-    cout << "Topic: " << topic << endl
-         << "Message: " << msg << endl
-         << "Buffer size: " << p_packet.buffer_size << endl
-         << "HEX: " << mtw_str::to_hex_string(p_packet.buffer, p_packet.buffer_size) << endl;
     Casend casend_cmd = Casend(CASEND, CMD_action_enum::WRITE, p_packet.buffer, p_packet.buffer_size);
     casend_cmd.add_value(Value((int)0));
     casend_cmd.add_value(Value((int)p_packet.buffer_size));
+    SimcomResp resp = this->send(casend_cmd);
+    return resp.valid(casend_cmd);
+}
+
+bool Simcom::mqtt_subscribe(string topic, uint16_t id)
+{
+    MqttSubPacket s_packet = MqttSubPacket(topic, id);
+    s_packet.create_packet();
+    Casend casend_cmd = Casend(CASEND, CMD_action_enum::WRITE, s_packet.buffer, s_packet.buffer_size);
+    casend_cmd.add_value(Value((int)0));
+    casend_cmd.add_value(Value((int)s_packet.buffer_size));
     SimcomResp resp = this->send(casend_cmd);
     return resp.valid(casend_cmd);
 }

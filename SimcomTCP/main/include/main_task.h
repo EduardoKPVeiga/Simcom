@@ -42,10 +42,4 @@ void main_task_init(void);
 
 void main_task(void *pvParameters);
 
-bool start_network(Simcom *simcom);
-
-bool start_mqtt(Simcom *simcom);
-
-bool send_msg(Simcom *simcom);
-
 #endif // MAIN_TASK_H

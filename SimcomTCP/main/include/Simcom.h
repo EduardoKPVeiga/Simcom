@@ -7,6 +7,8 @@
 #include "MqttConPacket.h"
 #include "MqttSubPacket.h"
 #include "MqttPubPacket.h"
+#include "MqttPingPacket.h"
+#include "MqttDiscPacket.h"
 
 #define SN_SIZE 7
 
@@ -28,9 +30,12 @@ public:
     bool power(bool pwr);
 
     bool mqtt_connect(string s_ip, int port);
-    bool start_network();
-    bool mqtt_send_msg(string topic, string msg);
-    bool close_connection();
+    bool mqtt_disconnect();
+    bool mqtt_publish(string topic, string msg);
+    bool mqtt_subscribe(string topic, uint16_t id);
+
+    bool network_connect();
+    bool network_disconnect();
 };
 
 #endif // SIMCOM_H
