@@ -91,9 +91,9 @@ void SimcomUart::simcom_uart_task(void *pvParameters)
                 if (mtw_str::StrContainsSubstr(raw_msg_received, CAURC, event.size, SIZE(CAURC)) >= 0)
                 {
                     server_msg = Caurc(raw_msg_received, event.size);
-                    cout << "event.size: " << event.size << endl
-                         << "server_msg.length: " << server_msg.length << endl
-                         << mtw_str::to_hex_string(server_msg.data, server_msg.length) << endl;
+                    cout << "Server Message: " << endl
+                         << mtw_str::to_hex_string(server_msg.data, server_msg.length) << endl
+                         << endl;
                     break;
                 }
 

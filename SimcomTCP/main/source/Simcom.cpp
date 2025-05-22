@@ -71,6 +71,7 @@ bool Simcom::mqtt_connect(string s_ip, int port)
     resp = this->send(casend_cmd);
     if (!resp.valid(cmd))
         return false;
+    cout << "MQTT CONNECT" << endl;
 
     // MqttSubPacket s_packet = MqttSubPacket("S1mC0M5/2", 1564);
     // s_packet.create_packet();
@@ -143,8 +144,10 @@ bool Simcom::mqtt_send_msg(string topic, string msg)
 {
     MqttPubPacket p_packet = MqttPubPacket(topic, msg);
     p_packet.create_packet();
-    // cout << "Buffer size: " << p_packet.buffer_size << endl
-    //      << "HEX: " << mtw_str::to_hex_string(p_packet.buffer, p_packet.buffer_size) << endl;
+    cout << "Topic: " << topic << endl
+         << "Message: " << msg << endl
+         << "Buffer size: " << p_packet.buffer_size << endl
+         << "HEX: " << mtw_str::to_hex_string(p_packet.buffer, p_packet.buffer_size) << endl;
     Casend casend_cmd = Casend(CASEND, CMD_action_enum::WRITE, p_packet.buffer, p_packet.buffer_size);
     casend_cmd.add_value(Value((int)0));
     casend_cmd.add_value(Value((int)p_packet.buffer_size));

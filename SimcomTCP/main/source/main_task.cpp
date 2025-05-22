@@ -61,7 +61,7 @@ void main_task(void *pvParameters)
                 {
                     ESP_LOGE(TAG, "Start MQTT failed.");
                     simcom.close_connection();
-                    vTaskDelay(1000 / portTICK_PERIOD_MS);
+                    vTaskDelay(3000 / portTICK_PERIOD_MS);
                     main_task_send_message(RESTART_DEVICE);
                 }
                 else
