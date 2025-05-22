@@ -30,27 +30,6 @@ SimcomResp Simcom::send(Command cmd)
     cmd.build();
     simcomUart.send(cmd);
     SimcomResp resp = simcomUart.get_resp(cmd);
-    if (mtw_str::StrContainsSubstr((char *)(cmd.cmd), CARECV, SIZE(CARECV), SIZE(CARECV)) >= 0)
-    {
-        if (!resp.msg.contains(RESP_ERROR))
-        {
-            // +CARECV: <size>,<data>
-            uint16_t index = resp.msg.find(':') + 2;
-            uint16_t comma_pos = resp.msg.find(',');
-            string s = resp.msg.substr(index, comma_pos - index);
-            int size = stoi(s);
-            char *r = new char[size];
-            index = comma_pos + 1;
-            for (int i = 0; i < size; i++)
-            {
-                r[i] = resp.msg[index + i];
-            }
-            cout << "Size: " << size << endl
-                 << "HEX: " << mtw_str::to_hex_string(r, size) << endl;
-            MqttMsgAck ack = MqttMsgAck(r, size);
-            ack.decode();
-        }
-    }
     return resp;
 }
 
@@ -93,15 +72,15 @@ bool Simcom::mqtt_connect(string s_ip, int port)
     if (!resp.valid(cmd))
         return false;
 
-    MqttSubPacket s_packet = MqttSubPacket("S1mC0M5/2", 1564);
-    s_packet.create_packet();
-    casend_cmd = Casend(CASEND, CMD_action_enum::WRITE, s_packet.buffer, s_packet.buffer_size);
-    cmd = (Command)casend_cmd;
-    casend_cmd.add_value(Value((int)0));
-    casend_cmd.add_value(Value((int)s_packet.buffer_size));
-    resp = this->send(casend_cmd);
-    if (!resp.valid(cmd))
-        return false;
+    // MqttSubPacket s_packet = MqttSubPacket("S1mC0M5/2", 1564);
+    // s_packet.create_packet();
+    // casend_cmd = Casend(CASEND, CMD_action_enum::WRITE, s_packet.buffer, s_packet.buffer_size);
+    // cmd = (Command)casend_cmd;
+    // casend_cmd.add_value(Value((int)0));
+    // casend_cmd.add_value(Value((int)s_packet.buffer_size));
+    // resp = this->send(casend_cmd);
+    // if (!resp.valid(cmd))
+    //     return false;
 
     return true;
 }
@@ -164,6 +143,8 @@ bool Simcom::mqtt_send_msg(string topic, string msg)
 {
     MqttPubPacket p_packet = MqttPubPacket(topic, msg);
     p_packet.create_packet();
+    // cout << "Buffer size: " << p_packet.buffer_size << endl
+    //      << "HEX: " << mtw_str::to_hex_string(p_packet.buffer, p_packet.buffer_size) << endl;
     Casend casend_cmd = Casend(CASEND, CMD_action_enum::WRITE, p_packet.buffer, p_packet.buffer_size);
     casend_cmd.add_value(Value((int)0));
     casend_cmd.add_value(Value((int)p_packet.buffer_size));
