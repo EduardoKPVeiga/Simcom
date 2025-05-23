@@ -68,15 +68,30 @@ void main_task(void *pvParameters)
                     main_task_send_message(SEND_MSG);
                 break;
 
+            case DISCONNECT_MQTT:
+                ESP_LOGI(TAG, "DISCONNECT_MQTT");
+                if (simcom.mqtt_disconnect())
+                {
+                    simcom.network_disconnect();
+                    vTaskDelay(10000 / portTICK_PERIOD_MS);
+                    main_task_send_message(START_NETWORK);
+                }
+                else
+                    main_task_send_message(RESTART_DEVICE);
+                break;
+
             case SEND_MSG:
                 ESP_LOGI(TAG, "SEND_MSG");
                 if (simcom.mqtt_publish("S1mC0M5/2", "teste"))
                 {
                     vTaskDelay(5000 / portTICK_PERIOD_MS);
-                    main_task_send_message(SEND_MSG);
+                    main_task_send_message(DISCONNECT_MQTT);
                 }
                 else
+                {
+                    vTaskDelay(5000 / portTICK_PERIOD_MS);
                     main_task_send_message(RESTART_DEVICE);
+                }
                 break;
 
             case RESTART_DEVICE:

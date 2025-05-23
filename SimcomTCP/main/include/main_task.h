@@ -23,6 +23,7 @@ typedef enum main_task_message
 {
     START_NETWORK,
     START_MQTT,
+    DISCONNECT_MQTT,
     SEND_MSG,
     RESTART_DEVICE,
     SIMCOM_PRW_ON
