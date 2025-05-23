@@ -9,7 +9,7 @@ TaskHandle_t SimcomUart::uartGsmTaskHandle = NULL;
 volatile bool SimcomUart::received = false;
 uart_port_t SimcomUart::uart_num = UART_NUM_2;
 SimcomRespList SimcomUart::simcom_resp_list = SimcomRespList();
-queue<Caurc> server_msg_queue = queue<Caurc>();
+queue<Caurc> SimcomUart::server_msg_queue = queue<Caurc>();
 
 SimcomUart::SimcomUart()
 {
@@ -94,6 +94,7 @@ void SimcomUart::simcom_uart_task(void *pvParameters)
                     cout << "Server Message: " << endl
                          << mtw_str::to_hex_string(server_msg.data, server_msg.length) << endl
                          << endl;
+                    server_msg_queue.push(server_msg);
                     break;
                 }
 

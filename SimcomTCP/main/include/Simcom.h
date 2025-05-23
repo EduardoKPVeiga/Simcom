@@ -19,7 +19,7 @@ private:
     string serial_num;
 
     SimcomResp send(Command cmd);
-    SimcomResp send(Casend cmd);
+    Caurc send(Casend cmd);
     SimcomResp get_resp(Command cmd);
 
 public:
@@ -33,6 +33,7 @@ public:
     bool mqtt_disconnect();
     bool mqtt_publish(string topic, string msg);
     bool mqtt_subscribe(string topic, uint16_t id);
+    bool mqtt_connected();
 
     bool network_connect();
     bool network_disconnect();

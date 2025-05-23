@@ -33,11 +33,17 @@ SimcomResp Simcom::send(Command cmd)
     return resp;
 }
 
-SimcomResp Simcom::send(Casend casend_cmd)
+Caurc Simcom::send(Casend casend_cmd)
 {
+    Caurc server_msg = Caurc();
     casend_cmd.build();
     simcomUart.send(casend_cmd);
-    return simcomUart.get_resp(casend_cmd);
+    if (simcomUart.get_resp(casend_cmd).valid((Command)casend_cmd) && simcomUart.server_msg_queue.size() > 0)
+    {
+        server_msg = simcomUart.server_msg_queue.front();
+        simcomUart.server_msg_queue.pop();
+    }
+    return server_msg;
 }
 
 SimcomResp Simcom::get_resp(Command cmd)
@@ -87,7 +93,7 @@ bool Simcom::mqtt_connect(string s_ip, int port)
 
 bool Simcom::mqtt_disconnect()
 {
-    SimcomResp resp = SimcomResp();
+    Caurc resp = Caurc();
     Command cmd = Command();
     MqttDiscPacket c_packet = MqttDiscPacket();
     c_packet.create_packet();
@@ -96,8 +102,26 @@ bool Simcom::mqtt_disconnect()
     casend_cmd.add_value(Value((int)0));
     casend_cmd.add_value(Value((int)c_packet.buffer_size));
     resp = this->send(casend_cmd);
-    if (!resp.valid(cmd))
-        return false;
+    return resp.valid(cmd);
+}
+
+bool Simcom::mqtt_connected()
+{
+    Caurc resp = Caurc();
+    Command cmd = Command();
+    MqttPingPacket c_packet = MqttPingPacket();
+    c_packet.create_packet();
+    Casend casend_cmd = Casend(CASEND, CMD_action_enum::WRITE, c_packet.buffer, c_packet.buffer_size);
+    cmd = (Command)casend_cmd;
+    casend_cmd.add_value(Value((int)0));
+    casend_cmd.add_value(Value((int)c_packet.buffer_size));
+    resp = this->send(casend_cmd);
+    if (resp.length == 2)
+    {
+        if ((resp.data[0] >> 4) & 0xD)
+            return true;
+    }
+    return false;
 }
 
 bool Simcom::network_connect()
@@ -161,7 +185,7 @@ bool Simcom::mqtt_publish(string topic, string msg)
     Casend casend_cmd = Casend(CASEND, CMD_action_enum::WRITE, p_packet.buffer, p_packet.buffer_size);
     casend_cmd.add_value(Value((int)0));
     casend_cmd.add_value(Value((int)p_packet.buffer_size));
-    SimcomResp resp = this->send(casend_cmd);
+    Caurc resp = this->send(casend_cmd);
     return resp.valid(casend_cmd);
 }
 
@@ -172,6 +196,6 @@ bool Simcom::mqtt_subscribe(string topic, uint16_t id)
     Casend casend_cmd = Casend(CASEND, CMD_action_enum::WRITE, s_packet.buffer, s_packet.buffer_size);
     casend_cmd.add_value(Value((int)0));
     casend_cmd.add_value(Value((int)s_packet.buffer_size));
-    SimcomResp resp = this->send(casend_cmd);
+    Caurc resp = this->send(casend_cmd);
     return resp.valid(casend_cmd);
 }
